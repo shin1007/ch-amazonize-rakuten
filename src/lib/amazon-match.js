@@ -199,9 +199,39 @@
     return words.find((w) => w.includes('-')) || words[0] || '';
   }
 
-  /** 商品名に型番がそのまま入っているか（ハイフン・空白・大文字小文字の違いは無視する） */
+  /**
+   * 商品名に型番が入っているか（ハイフン・空白・大文字小文字の違いは無視する）。
+   * 末尾の色・販路の記号（-BK / -NBK / /N）だけ違うものも同じ型番とみなす
+   * （Yahoo!の LUA6-U3-AGTE-BK と Amazon限定の LUA6-U3-AGTE-NBK は同じ商品）。
+   */
   const squash = (s) => toHalf(s).toLowerCase().replace(/[\s-]+/g, '');
-  const titleHasModel = (model, title) => Boolean(model) && squash(title).includes(squash(model));
+  const modelCore = (m) => squash(toHalf(m).replace(/[-_/][A-Za-z]{1,4}$/, ''));
+  function titleHasModel(model, title) {
+    if (!model) return false;
+    const t = squash(title);
+    const core = modelCore(model);
+    return t.includes(squash(model)) || (core.length >= 6 && t.includes(core));
+  }
+
+  /**
+   * 候補の商品名に、こちらと違う型番が書いてあるか。名前で引くと、同じブランドの別の型番の商品
+   * （LANアダプターに USB-Cハブ LUD-U3-CU302SV）が語の重なりだけで当たるので、それを外すのに使う。
+   * 取り違えを避けるため、こちらの型番も候補の型番もハイフンを含む（型番らしさの強い）ときだけ見る。
+   */
+  function conflictsModel(model, title) {
+    if (!model || !model.includes('-') || titleHasModel(model, title)) return false;
+    const words = toHalf(title).match(/[A-Za-z0-9][A-Za-z0-9-]{2,22}[A-Za-z0-9]/g) || [];
+    return words.some((w) => w.includes('-') && isModelLike(w));
+  }
+
+  /** 名前で引いた候補を、こちらの型番（hint）で分ける。exact は型番が入っているもの、rest は違う型番の書いていないもの */
+  function splitByModel(items, hint) {
+    if (!hint) return { exact: [], rest: items };
+    return {
+      exact: items.filter((it) => titleHasModel(hint, it.title)),
+      rest: items.filter((it) => !conflictsModel(hint, it.title))
+    };
+  }
 
   /**
    * 商品ページに出す見出し。何を根拠に当てたのかを、そのまま言葉にする。
@@ -219,5 +249,5 @@
     return { label: 'の似た商品', badge: '参考', sure: false };
   }
 
-  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, packCount, samePack, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel };
+  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, packCount, samePack, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel, conflictsModel, splitByModel };
 })();
