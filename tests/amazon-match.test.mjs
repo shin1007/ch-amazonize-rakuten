@@ -242,7 +242,7 @@ test('同じ商品を開き直しても読みに行かない（結果は覚え�
   assert.equal(calls.length, 1);
   assert.equal(second.cached, true);
   assert.equal(second.item.asin, first.item.asin);
-  assert.ok(storage.azrAmazon['v3:jan:4580688635054:']);
+  assert.ok(storage.azrAmazon['v4:jan:4580688635054:']);
 });
 
 const EMPTY_HTML = '<!doctype html><html><body><div class="s-main-slot"></div></body></html>';
@@ -403,4 +403,11 @@ test('規格名（USB3.2-Gen1・Wi-Fi6・COVID-19）を型番と取り違えな�
   assert.equal(extractModel('Wi-Fi6 ルーター 無線LAN 11ax AX3000 WSR-3000AX4P-BK'), 'WSR-3000AX4P-BK');
   assert.equal(extractModel('COVID-19 抗原検査キット'), '');
   assert.equal(extractModel('ワイヤレスイヤホン Bluetooth5.3 IPX7 防水'), '');
+});
+
+test('Amazonの検索結果から配送料を読む（Cookieなしで読む、プライム会員ではない人の表示）', () => {
+  assert.deepEqual({ ...sw.amazonShipping('<span>￥70</span><div>配送料 <span>￥440</span> 10月14日 水曜日にお届け</div>') }, { kind: 'fee', fee: 440 });
+  assert.deepEqual({ ...sw.amazonShipping('<div>無料配送 10月14日 水曜日にお届け</div>') }, { kind: 'free', fee: 0 });
+  assert.deepEqual({ ...sw.amazonShipping('<div>無料配送 10月13日 火曜日にお届け 初回のご注文の場合</div>') }, { kind: 'conditional', fee: null });
+  assert.equal(sw.amazonShipping('<div>10月13日にお届け</div>'), null);
 });

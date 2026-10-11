@@ -74,18 +74,31 @@
       pricing: () => AZR.itemPricing?.value || null,
       same: (applied) => tr('{applied}楽天と同じ価格', { applied }),
       range: (applied, lo, hi) => tr('{applied}楽天は選択によって {lo}〜{hi}', { applied, lo, hi }),
-      note: () => tr('（表示価格の比較。楽天のポイント還元は含みません）')
+      note: (ship, coupon) => (coupon
+        ? (ship ? tr('（楽天はクーポン適用後・送料込み。ポイント還元は含みません）') : tr('（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）'))
+        : (ship ? tr('（送料込みの比較。楽天のポイント還元は含みません）') : tr('（表示価格の比較。送料・楽天のポイント還元は含みません）')))
     },
     yahoo: {
       key: 'yahoo', name: 'Yahoo!ショッピング',
       pricing: () => null,
       same: () => tr('Yahoo!ショッピングと同じ価格'),
       range: (applied, lo, hi) => tr('Yahoo!ショッピングは選択によって {lo}〜{hi}', { lo, hi }),
-      note: () => tr('（表示価格の比較。ポイント還元は含みません）')
+      note: (ship) => (ship ? tr('（送料込みの比較。ポイント還元は含みません）') : tr('（表示価格の比較。送料・ポイント還元は含みません）'))
     }
   };
 
   const note = (text) => h('div.azr-amazon-diff', h('span.azr-amazon-note', { text }));
+
+  /** 候補の送料（service worker が付ける { kind, fee }）。分からなければ空 */
+  function shipLabel(s) {
+    if (!s) return '';
+    if (s.kind === 'free') return tr('送料無料');
+    if (s.kind === 'fee') return tr('送料{fee}', { fee: yen(s.fee) });
+    if (s.kind === 'conditional') return tr('条件付き送料無料');
+    if (s.kind === 'separate') return tr('送料別');
+    return '';
+  }
+  const knownFee = (n) => (typeof n === 'number' && n >= 0 ? n : null);
 
   /**
    * 楽天の価格との差。ポイントは含まない、表示価格どうしの比較。
@@ -97,26 +110,29 @@
    *
    * 選択肢で値段が変わる商品（1,540円〜3,300円）も、どの選択肢と突き合わせたのか決められないので
    * 差は出さない。ただし楽天側の幅は事実なので添える（Amazonの値段と並べて本人が見比べられる）。
+   *
+   * 送料は、両方の金額が分かるとき（送料無料・送料込みは0円）だけ足して比べる。楽天・Yahoo!の検索APIは
+   * 「送料別」としか返さないことが多く、そのときは表示価格どうしで比べ、送料を含まないと書き添える。
    */
-  function diffLine(site, data, amazon, sure, home) {
+  function diffLine(site, data, item, sure, home) {
+    const otherFee = knownFee(item.shipping?.fee);
+    const homeFee = knownFee(data.shippingFee);
+    const ship = otherFee !== null && homeFee !== null;
+    const amazon = item.price + (ship ? otherFee : 0);
     // 使えるクーポンがあれば適用後の価格で比べる（条件を満たさないクーポンは効いていない）
     const pricing = home.pricing();
-    const rakuten = pricing ? pricing.min : data.minPrice;
+    const rakuten = (pricing ? pricing.min : data.minPrice) + (ship ? homeFee : 0);
     const high = pricing ? pricing.max : (data.maxPrice > data.minPrice ? data.maxPrice : null);
     const applied = pricing ? tr('クーポン適用後、') : '';
-    if (!(rakuten > 0) || !(amazon > 0)) return '';
-    if (high > rakuten) return note(home.range(applied, yen(rakuten), yen(high)));
+    if (!(rakuten > 0) || !(item.price > 0)) return '';
+    if (high > (pricing ? pricing.min : data.minPrice)) return note(home.range(applied, yen(pricing ? pricing.min : data.minPrice), yen(high)));
     if (!sure) return note(tr('同じ商品とは限らないので、値段は比べていません'));
     const d = Math.abs(rakuten - amazon);
     if (d === 0) return h('div.azr-amazon-diff.same', { text: home.same(applied) });
     const cheaper = amazon < rakuten ? site.key : home.key;
     return h('div.azr-amazon-diff', { 'data-cheaper': cheaper },
       h('strong', { text: tr('{who}が{d}安い', { who: tr(cheaper === home.key ? home.name : site.name), d: yen(d) }) }),
-      h('span.azr-amazon-note', {
-        text: pricing
-          ? tr('（楽天はクーポン適用後の価格。ポイント還元は含みません）')
-          : home.note()
-      })
+      h('span.azr-amazon-note', { text: home.note(ship, Boolean(pricing)) })
     );
   }
 
@@ -153,7 +169,7 @@ ${how}` },
             // 欄が狭いときは、価格は残して後ろの見出し・評価を…で切る
             h('span.azr-amz-price',
               h('span.azr-amz-amount', { text: `${site.label} ${r.item.price ? yen(r.item.price) : tr('価格不明')}` }),
-              h('span.azr-amz-via', { text: ` (${tag})${meta ? '  ' + meta : ''}` })),
+              h('span.azr-amz-via', { text: ` (${tag})${shipLabel(r.item.shipping) ? '・' + shipLabel(r.item.shipping) : ''}${meta ? '  ' + meta : ''}` })),
             h('span.azr-amz-name', { text: r.item.title })
           )
         ),
@@ -181,7 +197,7 @@ ${how}` },
     let diff = '';
     if (pick) {
       const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.pageTitle || data.title, pick.item.title) });
-      diff = diffLine(site, data, pick.item.price, sure, home);
+      diff = diffLine(site, data, pick.item, sure, home);
     }
     box.replaceChildren(
       itemRow(site, 'code', results.code, code, data),
@@ -201,6 +217,7 @@ ${how}` },
 
   /**
    * anchor の下に、店ごとの欄を sites の順に積む。data は { title, minPrice, maxPrice, jan, variants, descriptionHtml }。
+   * shippingFee はこのページの送料（送料無料・送料込みは0、分からなければ null）。
    * pageTitle があれば、まとめ売りの数と型番はそちら（ページに出ている元の商品名）で見る（title は検索用に整えた名前のことがある）。
    * 返すのは置いた欄（ページに描き直されて外れたら、呼んだ側が置き直す）と、結果がそろうと解決する done、
    * data の価格を書き換えたあとに値差を出し直す repaint。

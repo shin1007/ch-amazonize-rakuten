@@ -46,7 +46,7 @@
       "run_at": "document_end"
     },
     {
-      "matches": ["https://shopping.yahoo.co.jp/search*"],
+      "matches": ["https://shopping.yahoo.co.jp/search*", "https://shopping.yahoo.co.jp/category/*"],
       "js": ["src/lib/settings.js", "src/lib/health.js", "src/content/yahoo-search.js"],
       "css": ["src/styles/yahoo.css"],
       "run_at": "document_end"

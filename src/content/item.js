@@ -74,6 +74,8 @@
         url: `https://www.rakuten.co.jp/${app.shop?.shopUrl || ''}/`
       },
       jan: janFromAppData(sku),
+      // 送料込みなら0。送料別の金額は届け先で変わり、このデータには無いので分からない（null）
+      shippingFee: sku.shipping?.postageIncluded === true ? 0 : null,
       variants: (sku.variantSelectors || []).map((v) => v.label).filter(Boolean),
       review: reviewFromAppData(sku),
       // 商品説明文 → 販売説明文 の順（元のページと同じ並び）

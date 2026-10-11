@@ -292,7 +292,10 @@
                     const via = document.createElement('span');
                     // 幅0から伸ばす（見出しの長さで、価格に要る最小幅が広がらないように）
                     Object.assign(via.style, { flex: '1 1 auto', width: '0', minWidth: '0', overflow: 'hidden', textOverflow: 'ellipsis' });
-                    via.textContent = tag;
+                    // 送料の区分（楽天は送料込み/送料別、Yahoo!は送料無料/条件付き送料無料。金額は検索APIに無い）
+                    const ship = it.postageFlag === 0 || it.shippingCode === 2 ? tr('送料無料')
+                        : it.postageFlag === 1 ? tr('送料別') : it.shippingCode === 3 ? tr('条件付き送料無料') : '';
+                    via.textContent = ship ? `${tag}・${ship}` : tag;
                     pr.append(amount, via);
                     const nm = document.createElement('div');
                     Object.assign(nm.style, { display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere' });

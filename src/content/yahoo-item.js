@@ -58,7 +58,8 @@
         const delta = e.key === 'ArrowLeft' ? -1 : 1;
         const nav = modalButton(delta < 0 ? 'leftArrowButton' : 'rightArrowButton');
         if (nav) nav.click();
-        else if (!step(delta)) return;
+        // カート・選択肢など、画像以外の画面が開いているときは、後ろの商品画像を送らない
+        else if (document.querySelector('.ModalView--open') || !step(delta)) return;
         e.preventDefault();
         e.stopPropagation();
     }, true);
@@ -79,6 +80,16 @@
         .filter((s) => s?.stock?.isAvailable !== false && Number(s?.price?.applicablePrice) > 0);
     const prices = skus.map((s) => Number(s.price.applicablePrice));
     const jan = item.isJanCodeActive === false ? '' : String(item.janCode || '');
+    // このページの送料（届け先の都道府県の分）。「同一ストア3,000円以上で送料無料」は、この商品だけで超えるときだけ0にする
+    const postage = JSON.parse(document.getElementById('__NEXT_DATA__')?.textContent || 'null')?.props?.pageProps?.postage || null;
+    const freeOver = Number((String(postage?.conditionFreeText || '').match(/([\d,]+)\s*円以上/)?.[1] || '').replace(/,/g, '')) || 0;
+    const shippingFee = (price) => {
+        if (!postage) return null;
+        if (postage.isPostageFree) return 0;
+        const fee = Number(postage.fee);
+        if (!Number.isFinite(fee)) return null;
+        return freeOver && price >= freeOver ? 0 : fee;
+    };
     const data = {
         title: await betterTitle(clean(item.name), jan),
         // 「2kg 2個セット」のような数や型番は、他店の名前に置き換える前の、このページの商品名で見る
@@ -90,6 +101,7 @@
         // 型番を拾う手がかり（item-amazon.js が extractModel に渡す）
         descriptionHtml: [item.caption, item.information].filter((s) => typeof s === 'string' && s)
     };
+    data.shippingFee = shippingFee(data.minPrice);
 
     /** JANがあれば、同じJANで売っている他店の商品名と比べて、いちばん他と重なる名前を選ぶ（自分の名前も候補に入れる） */
     async function betterTitle(title, jan) {
@@ -129,6 +141,7 @@
             lastShown = now;
             data.minPrice = now;
             data.maxPrice = null;
+            data.shippingFee = shippingFee(now);
             repaint();
         });
     }).observe(document.body, { childList: true, subtree: true, characterData: true });

@@ -332,7 +332,8 @@ function parseAmazonResult(asin, chunk) {
     rating: rating ? Number(rating[1]) : null,
     count: num(count),
     image: image ? image[1] : null,
-    url: amazonItemUrl(asin)
+    url: amazonItemUrl(asin),
+    shipping: amazonShipping(chunk)
   };
 }
 
@@ -454,6 +455,32 @@ async function amazonLookup(args) {
   return r;
 }
 
+/*
+ * 送料。{ kind, fee }。kind は free（送料無料・送料込み）/ fee（金額が分かる）/ conditional（条件付き送料無料）/
+ * separate（送料別。金額は分からない）。楽天・Yahoo!の検索APIは金額を返さないので、分かるのは区分だけのことが多い。
+ */
+function rakutenShipping(postageFlag) {
+    if (postageFlag === 0) return { kind: 'free', fee: 0 };
+    if (postageFlag === 1) return { kind: 'separate', fee: null };
+    return null;
+}
+function yahooShipping(code) {
+    if (code === 2) return { kind: 'free', fee: 0 };
+    if (code === 3) return { kind: 'conditional', fee: null };
+    return null;
+}
+/**
+ * Amazonの検索結果の枠に書かれた配送料（Cookieなしで読むので、プライム会員ではない人の表示）。
+ *   「配送料 ￥440」→ 440 / 「無料配送 … 初回のご注文の場合」→ 条件付き / 「無料配送」→ 無料
+ */
+function amazonShipping(chunk) {
+    const text = decodeEntities(String(chunk).replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ');
+    const fee = text.match(/配送料\s*[¥￥]\s*([\d,]+)/);
+    if (fee) return { kind: 'fee', fee: Number(fee[1].replace(/,/g, '')) };
+    if (/無料配送|配送料無料/.test(text)) return /初回のご注文|以上の注文|以上のご注文/.test(text) ? { kind: 'conditional', fee: null } : { kind: 'free', fee: 0 };
+    return null;
+}
+
 const AMAZON_NO_RESULTS = /検索クエリに一致する結果はありません|No results for/;
 
 async function amazonLookupRaw({ title, jan, model, hint = '' }) {
@@ -533,7 +560,8 @@ async function amazonPrice({ title, jan, model, hint = '' }) {
   // v2: リンクを中継ページ経由にした（v1 のキャッシュには、Amazon直リンクが入っている）
   // v3: まとめ売りの数が違う商品の一致度を下げた（v2 のキャッシュには、1個売りに当てた「2点セット」が残っている）
   // JANで引くときも型番（JANで無いときの引き直しに使う）を、名前で引くときも型番の手がかり（hint）をキーに入れる
-  const key = AZR.amazon.isJan(jan) ? `v3:jan:${jan}:${model || ''}` : model ? `v3:m:${model}:${AZR.amazon.buildQuery(title)}` : `v3:q:${AZR.amazon.buildQuery(title)}:${hint}`;
+  // v4: 配送料（shipping）を足した
+  const key = AZR.amazon.isJan(jan) ? `v4:jan:${jan}:${model || ''}` : model ? `v4:m:${model}:${AZR.amazon.buildQuery(title)}` : `v4:q:${AZR.amazon.buildQuery(title)}:${hint}`;
   const { azrAmazon: cache = {} } = await chrome.storage.local.get('azrAmazon');
   const now = Date.now();
   const hit = cache[key];
@@ -1266,9 +1294,37 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // 楽天検索は中継Worker経由（APIキーは拡張機能に含めない）
 const RL_PROXY = 'https://amazon-rakuten-link.shin1007.workers.dev/search';
 
+/*
+ * 中継Workerへの問い合わせ。同じURLは30分まとめる（同時に来たものは1回の通信を待ち合わせ、終わったものは覚えておく）。
+ * Yahoo!の商品ページは、商品名の補正（JANで他店の名前を引く）とJANでの価格で同じ問い合わせを2回するし、
+ * 商品ページを開き直すたびに同じ検索語で引く。中継Workerには同じIPから1分60回の制限があるので、無駄に数を使わない。
+ * 制限に当たった（429）ときは、少し待って1度だけ引き直す。失敗した応答は覚えない。
+ */
+const RELAY_TTL_MS = 30 * 60 * 1000;
+const RELAY_RETRY_MS = 2000;
+const relayCache = new Map(); // url → { at, promise }
+
+function relayFetch(url) {
+    const now = Date.now();
+    for (const [k, v] of relayCache) if (now - v.at >= RELAY_TTL_MS) relayCache.delete(k);
+    const hit = relayCache.get(url);
+    if (hit) return hit.promise;
+    const promise = (async () => {
+        for (let i = 0; ; i++) {
+            const r = await fetch(url, { credentials: 'omit' });
+            const j = await r.json().catch(() => ({}));
+            if (r.status === 429 && i === 0) { await new Promise((res) => setTimeout(res, RELAY_RETRY_MS)); continue; }
+            return { ok: r.ok, status: r.status, json: j };
+        }
+    })();
+    relayCache.set(url, { at: now, promise });
+    promise.then((r) => { if (!r.ok) relayCache.delete(url); }, () => relayCache.delete(url));
+    return promise;
+}
+
 async function rlSearch(keyword) {
-    const r = await fetch(`${RL_PROXY}?keyword=${encodeURIComponent(keyword)}`, { credentials: 'omit' });
-    const j = await r.json().catch(() => ({}));
+    const { ok, status, json: j } = await relayFetch(`${RL_PROXY}?keyword=${encodeURIComponent(keyword)}`);
+    const r = { ok, status };
     health.check('relay.rakutenSearch', r.ok && Array.isArray(j.items), j.error || `HTTP ${r.status}`);
     if (!r.ok) return { error: j.error || `HTTP ${r.status}`, searchUrl: j.searchUrl };
     if (await noAffiliate()) {
@@ -1294,8 +1350,8 @@ function unwrapVc(u) {
 
 async function ysSearch({ keyword = '', jan = '' }) {
     const q = jan ? `jan=${encodeURIComponent(jan)}` : `keyword=${encodeURIComponent(keyword)}`;
-    const r = await fetch(`${YS_PROXY}?${q}`, { credentials: 'omit' });
-    const j = await r.json().catch(() => ({}));
+    const { ok, status, json: j } = await relayFetch(`${YS_PROXY}?${q}`);
+    const r = { ok, status };
     health.check('relay.yahooSearch', r.ok && Array.isArray(j.items), j.error || `HTTP ${r.status}`);
     if (!r.ok) return { error: j.error || `HTTP ${r.status}` };
     if (await noAffiliate()) {
@@ -1337,7 +1393,8 @@ async function yahooPrice({ title, jan, model, hint = '' }) {
     const searchUrl = res.searchUrl;
     const items = (res.items || []).filter((it) => it.itemPrice > 0).map((it) => ({
         title: it.itemName, price: it.itemPrice, url: it.affiliateUrl || it.itemUrl, image: it.imageUrl,
-        rating: it.rating || 0, count: it.reviewCount || 0, score: AZR.amazon.scoreMatch(title, it.itemName)
+        rating: it.rating || 0, count: it.reviewCount || 0, score: AZR.amazon.scoreMatch(title, it.itemName),
+        shipping: yahooShipping(it.shippingCode)
     })).filter((it, _, all) => AZR.amazon.sameCondition(title, all).includes(it));
     if (!items.length) return { status: 'none', query, searchUrl };
     if (useJan) return { status: 'ok', query, searchUrl, byJan: true, item: items[0] };
@@ -1384,7 +1441,8 @@ async function rakutenPrice({ title, jan, model, hint = '' }) {
     const searchUrl = res.searchUrl;
     const items = (res.items || []).filter((it) => it.itemPrice > 0).map((it) => ({
         title: it.itemName, price: it.itemPrice, url: it.affiliateUrl || it.itemUrl, image: it.imageUrl,
-        shop: it.shopCode || '', score: AZR.amazon.scoreMatch(title, it.itemName)
+        shop: it.shopCode || '', score: AZR.amazon.scoreMatch(title, it.itemName),
+        shipping: rakutenShipping(it.postageFlag)
     })).filter((it, _, all) => AZR.amazon.sameCondition(title, all).includes(it));
     // JANは語として引くので、説明に別の商品のJANまで並べた店の商品も当たる。名前の重なりが極端に低いものは外す
     const topScore = Math.max(0, ...items.map((it) => it.score));

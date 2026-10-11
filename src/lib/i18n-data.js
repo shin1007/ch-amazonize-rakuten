@@ -213,7 +213,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "(Listed prices compared; points not included)",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "Show Amazon and Rakuten prices on Yahoo! Shopping item pages",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo! Shopping: {lo}–{hi} depending on the option",
-      "セット数が違う": "Different pack size"
+      "セット数が違う": "Different pack size",
+      "送料無料": "Free shipping",
+      "送料{fee}": "Shipping {fee}",
+      "条件付き送料無料": "Free shipping (conditions apply)",
+      "送料別": "Shipping extra",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "(Rakuten after coupon, incl. shipping. Points not included)",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "(Rakuten after coupon. Shipping and points not included)",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "(Compared incl. shipping. Rakuten points not included)",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Listed prices compared. Shipping and Rakuten points not included)",
+      "（送料込みの比較。ポイント還元は含みません）": "(Compared incl. shipping. Points not included)",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)"
     },
     "id": {
       "楽天 ￥{p}{via}": "Rakuten ¥{p}{via}",
@@ -426,7 +436,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "(Perbandingan harga tertera, tidak termasuk poin)",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "Tampilkan harga Amazon dan Rakuten di halaman produk Yahoo! Shopping",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo! Shopping: {lo}–{hi} tergantung pilihan",
-      "セット数が違う": "Jumlah set berbeda"
+      "セット数が違う": "Jumlah set berbeda",
+      "送料無料": "Gratis ongkir",
+      "送料{fee}": "Ongkir {fee}",
+      "条件付き送料無料": "Gratis ongkir bersyarat",
+      "送料別": "Belum termasuk ongkir",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "(Rakuten setelah kupon, termasuk ongkir. Poin tidak termasuk)",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "(Harga Rakuten setelah kupon. Ongkir dan poin tidak termasuk)",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin Rakuten tidak termasuk)",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin Rakuten tidak termasuk)",
+      "（送料込みの比較。ポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin tidak termasuk)",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin tidak termasuk)"
     },
     "ko": {
       "楽天 ￥{p}{via}": "라쿠텐 ¥{p}{via}",
@@ -639,7 +659,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "(표시 가격 비교. 포인트 적립은 포함하지 않습니다)",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "Yahoo! 쇼핑 상품 페이지에 Amazon・라쿠텐 가격 표시",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo! 쇼핑은 선택에 따라 {lo}~{hi}",
-      "セット数が違う": "세트 수량이 다름"
+      "セット数が違う": "세트 수량이 다름",
+      "送料無料": "무료 배송",
+      "送料{fee}": "배송비 {fee}",
+      "条件付き送料無料": "조건부 무료 배송",
+      "送料別": "배송비 별도",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "(라쿠텐은 쿠폰 적용 후·배송비 포함. 포인트 적립은 포함하지 않습니다)",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "(라쿠텐은 쿠폰 적용 후 가격. 배송비·포인트 적립은 포함하지 않습니다)",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "(배송비 포함 비교. 라쿠텐 포인트 적립은 포함하지 않습니다)",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(표시 가격 비교. 배송비·라쿠텐 포인트 적립은 포함하지 않습니다)",
+      "（送料込みの比較。ポイント還元は含みません）": "(배송비 포함 비교. 포인트 적립은 포함하지 않습니다)",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(표시 가격 비교. 배송비·포인트 적립은 포함하지 않습니다)"
     },
     "vi": {
       "楽天 ￥{p}{via}": "Rakuten ¥{p}{via}",
@@ -852,7 +882,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "(So sánh giá niêm yết, không tính điểm thưởng)",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "Hiển thị giá Amazon và Rakuten trên trang sản phẩm Yahoo! Shopping",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo! Shopping: {lo}–{hi} tùy lựa chọn",
-      "セット数が違う": "Khác số lượng bộ"
+      "セット数が違う": "Khác số lượng bộ",
+      "送料無料": "Miễn phí vận chuyển",
+      "送料{fee}": "Phí ship {fee}",
+      "条件付き送料無料": "Miễn phí ship có điều kiện",
+      "送料別": "Chưa gồm phí ship",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "(Rakuten sau phiếu giảm giá, đã gồm phí ship. Không tính điểm thưởng)",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "(Giá Rakuten sau phiếu giảm giá. Không tính phí ship và điểm thưởng)",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng Rakuten)",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng Rakuten)",
+      "（送料込みの比較。ポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng)",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng)"
     },
     "zh_CN": {
       "楽天 ￥{p}{via}": "乐天 ¥{p}{via}",
@@ -1065,7 +1105,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "（比较的是标价，不含积分返还）",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "在 Yahoo! 购物的商品页显示亚马逊和乐天的价格",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo!购物 根据所选规格为 {lo}〜{hi}",
-      "セット数が違う": "套装数量不同"
+      "セット数が違う": "套装数量不同",
+      "送料無料": "免运费",
+      "送料{fee}": "运费{fee}",
+      "条件付き送料無料": "满足条件免运费",
+      "送料別": "运费另计",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "（乐天为使用优惠券后、含运费的价格，不含积分返还）",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "（乐天为使用优惠券后的价格，不含运费和积分返还）",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "（含运费比较，不含乐天积分返还）",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "（比较的是标价，不含运费和乐天积分返还）",
+      "（送料込みの比較。ポイント還元は含みません）": "（含运费比较，不含积分返还）",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "（比较的是标价，不含运费和积分返还）"
     },
     "zh_TW": {
       "楽天 ￥{p}{via}": "樂天 ¥{p}{via}",
@@ -1278,7 +1328,17 @@
       "（表示価格の比較。ポイント還元は含みません）": "（比較的是標價，不含點數回饋）",
       "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "在 Yahoo! 購物的商品頁顯示亞馬遜與樂天的價格",
       "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo!購物 依所選規格為 {lo}〜{hi}",
-      "セット数が違う": "組合數量不同"
+      "セット数が違う": "組合數量不同",
+      "送料無料": "免運費",
+      "送料{fee}": "運費{fee}",
+      "条件付き送料無料": "符合條件免運費",
+      "送料別": "運費另計",
+      "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "（樂天為套用優惠券後、含運費的價格，不含點數回饋）",
+      "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "（樂天為套用優惠券後的價格，不含運費與點數回饋）",
+      "（送料込みの比較。楽天のポイント還元は含みません）": "（含運費比較，不含樂天點數回饋）",
+      "（表示価格の比較。送料・楽天のポイント還元は含みません）": "（比較的是標價，不含運費與樂天點數回饋）",
+      "（送料込みの比較。ポイント還元は含みません）": "（含運費比較，不含點數回饋）",
+      "（表示価格の比較。送料・ポイント還元は含みません）": "（比較的是標價，不含運費與點數回饋）"
     }
   };
 })();

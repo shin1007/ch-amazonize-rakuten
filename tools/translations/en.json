@@ -209,5 +209,15 @@
   "（表示価格の比較。ポイント還元は含みません）": "(Listed prices compared; points not included)",
   "Yahoo!ショッピングの商品ページにAmazon・楽天の価格を出す": "Show Amazon and Rakuten prices on Yahoo! Shopping item pages",
   "Yahoo!ショッピングは選択によって {lo}〜{hi}": "Yahoo! Shopping: {lo}–{hi} depending on the option",
-  "セット数が違う": "Different pack size"
+  "セット数が違う": "Different pack size",
+  "送料無料": "Free shipping",
+  "送料{fee}": "Shipping {fee}",
+  "条件付き送料無料": "Free shipping (conditions apply)",
+  "送料別": "Shipping extra",
+  "（楽天はクーポン適用後・送料込み。ポイント還元は含みません）": "(Rakuten after coupon, incl. shipping. Points not included)",
+  "（楽天はクーポン適用後の価格。送料・ポイント還元は含みません）": "(Rakuten after coupon. Shipping and points not included)",
+  "（送料込みの比較。楽天のポイント還元は含みません）": "(Compared incl. shipping. Rakuten points not included)",
+  "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Listed prices compared. Shipping and Rakuten points not included)",
+  "（送料込みの比較。ポイント還元は含みません）": "(Compared incl. shipping. Points not included)",
+  "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)"
 }
