@@ -242,7 +242,7 @@ test('同じ商品を開き直しても読みに行かない（結果は覚え�
   assert.equal(calls.length, 1);
   assert.equal(second.cached, true);
   assert.equal(second.item.asin, first.item.asin);
-  assert.ok(storage.azrAmazon['v2:jan:4580688635054']);
+  assert.ok(storage.azrAmazon['v3:jan:4580688635054']);
 });
 
 const EMPTY_HTML = '<!doctype html><html><body><div class="s-main-slot"></div></body></html>';
@@ -283,4 +283,27 @@ test('弾かれた結果は覚えない（次に開いたときは読みに行�
   const res = await s.amazonPrice({ title: 'スカルプD シャンプー 350ml' });
   assert.equal(res.status, 'blocked');
   assert.deepEqual(storage, {});
+});
+
+/* まとめ売りの数 ----------------------------------------------------------- */
+
+test('まとめ売りの数を商品名から拾う（宣伝の括弧の中も見る）。書いていなければ1', () => {
+  const { packCount } = AZR.amazon;
+  assert.equal(packCount('【2点セット【Amazon.co.jp限定】】バッファロー USB3.2(Gen1)対応 LANアダプター'), 2);
+  assert.equal(packCount('バッファロー（Buffalo） Giga対応 Type-A USB 3.2 (Gen1)用 LANアダプター LUA6-U3-AGTE-BK'), 1);
+  assert.equal(packCount('お茶 500ml×24本'), 24);
+  assert.equal(packCount('温泡 5個セット（20錠×5個入）'), 5);
+  assert.equal(packCount('ティッシュ 5箱組'), 5);
+  assert.equal(packCount('USB-C ケーブル 1m 2.4A'), 1);
+  assert.equal(packCount('モニター 1920x1080 27インチ'), 1);
+});
+
+test('1個売りに2点セットが当たったら、名前の一致度を下げ、JANが合っていても値段は比べない', () => {
+  const one = 'バッファロー Giga対応 Type-A USB3.2(Gen1) LANアダプター LUA6-U3-AGTE-BK';
+  const two = '【2点セット【Amazon.co.jp限定】】バッファロー Giga対応 Type-A USB3.2(Gen1) LANアダプター LUA6-U3-AGTE-BK';
+  assert.ok(scoreMatch(one, two) < scoreMatch(one, one) / 2 + 0.01);
+  const r = matchLabel({ byJan: true, pack: AZR.amazon.samePack(one, two) });
+  assert.equal(r.sure, false);
+  assert.equal(r.badge, 'セット数が違う');
+  assert.equal(matchLabel({ byJan: true, pack: AZR.amazon.samePack(one, one) }).sure, true);
 });

@@ -508,7 +508,8 @@ async function amazonLookupRaw({ title, jan, model }) {
 /** 価格は日単位で動くが、同じ商品ページを開き直すたびに読みに行く必要は無い。 */
 async function amazonPrice({ title, jan, model }) {
   // v2: リンクを中継ページ経由にした（v1 のキャッシュには、Amazon直リンクが入っている）
-  const key = AZR.amazon.isJan(jan) ? `v2:jan:${jan}` : model ? `v2:m:${model}:${AZR.amazon.buildQuery(title)}` : `v2:q:${AZR.amazon.buildQuery(title)}`;
+  // v3: まとめ売りの数が違う商品の一致度を下げた（v2 のキャッシュには、1個売りに当てた「2点セット」が残っている）
+  const key = AZR.amazon.isJan(jan) ? `v3:jan:${jan}` : model ? `v3:m:${model}:${AZR.amazon.buildQuery(title)}` : `v3:q:${AZR.amazon.buildQuery(title)}`;
   const { azrAmazon: cache = {} } = await chrome.storage.local.get('azrAmazon');
   const now = Date.now();
   const hit = cache[key];
