@@ -88,9 +88,12 @@
    * 宣伝の括弧（【2点セット【Amazon.co.jp限定】】）の中に書かれることが多いので、宣伝を落とす前の商品名で見る。
    */
   const PACK_RES = [
-    /(\d+)\s*(?:点|個|本|袋|箱|缶|パック|枚|足|台)?\s*セット/g,
+    /(\d+)\s*(?:点|個|本|袋|箱|缶|パック|枚|足|台|冊|巻)?\s*セット/g,
+    /全\s*(\d+)\s*(?:冊|巻)/g, // 「上下巻セット（全2冊）」
+    /(\d+)\s*食/g, // 「1ケース（20食）」と「78g×20個」は同じ数
+    /(\d+)\s*(?:個|本|袋|缶|パック)\s*入(?!り?\s*[×xX*])/g, // 「24本入」。「20錠入×5」のように中身の数のあとに掛け算が続くものは除く
     /(\d+)\s*(?:個|本|袋|箱|缶|パック)\s*組/g,
-    /[×xX*]\s*(\d+)\s*(?:個|本|袋|箱|缶|パック|セット)/g
+    /[×xX*]\s*(\d+)\s*(?:\([^()]*\))?\s*(?:個|本|袋|箱|缶|パック|セット)/g // 「×48(24×2)本入」
   ];
   function packCount(title) {
     const s = toHalf(title);
@@ -99,6 +102,15 @@
     return n;
   }
   const samePack = (a, b) => packCount(a) === packCount(b);
+
+  /**
+   * 中古・整備済み品。新品の商品ページに、楽天の【中古】175円やAmazonの【整備済み品】を当てると、
+   * 「楽天が22,500円安い」のような嘘の値差になる。こちらが中古でない限り、候補から外す。
+   */
+  const USED = /中古|整備済み|リファービッシュ|Renewed|再生品|ジャンク|展示品|開封品|訳あり|わけあり|アウトレット品|未使用(?:品|[】\]\)/・])/i;
+  const isUsed = (title) => USED.test(toHalf(title));
+  /** こちらの商品名（新品か中古か）に合わせて、候補を絞る */
+  const sameCondition = (title, items) => (isUsed(title) ? items : items.filter((it) => !isUsed(it.title)));
 
   /**
    * 突き合わせに使う語。日本語は分かち書きしないので、ラテン文字・数字・カタカナ・漢字の
@@ -188,15 +200,19 @@
    * 説明文の「型番」の表記を優先し、無ければ商品名の中でハイフンを含む語、無ければ最初の語を採る。
    */
   const MODEL_LABEL = /(?:メーカー型番|製品型番|型番|型式|品番|モデル(?:名|番号)?|Model(?:\s*(?:No\.?|Number))?)\s*[:：]?\s*([A-Za-z0-9][A-Za-z0-9._/-]{2,28})/i;
-  const MODEL_SKIP = /^(?:\d+(?:\.\d+)?(?:ml|l|g|kg|mg|cm|mm|m|個|枚|本|袋|包|錠|回|pcs|inch)|usb-?c?|spf\d+|pa\++|\d+k|\d+hz|\d+gb|\d+tb|\d+mah|\d+w|\d+v|jan\d*)$/i;
+  const MODEL_SKIP = /^(?:\d+(?:\.\d+)?(?:ml|l|g|kg|mg|cm|mm|m|個|枚|本|袋|包|錠|回|pcs|inch)|usb-?c?|spf\d+|pa\++|\d+k|\d+hz|\d+gb|\d+tb|\d+mah|\d+w|\d+v|jan\d*|\d+k\d+hz|wi-?fi\d*|bluetooth\d*|iphone\d*|ipx\d|ip\d\d|covid-?\d+|gen\d|ddr\d|ax\d{3,4}|ac\d{3,4})$/i;
   const isModelLike = (w) => /[A-Za-z]/.test(w) && /\d/.test(w) && w.length >= 4 && w.length <= 24 && !MODEL_SKIP.test(w) && !isJan(w);
 
   function extractModel(title, descriptions = []) {
     const text = descriptions.map((h) => toHalf(String(h || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '))).join(' ');
     const labeled = text.match(MODEL_LABEL);
     if (labeled && isModelLike(labeled[1].replace(/[._/]+$/, ''))) return labeled[1].replace(/[._/]+$/, '');
-    const words = (toHalf(stripShout(String(title || ''))).match(/[A-Za-z0-9][A-Za-z0-9-]{2,22}[A-Za-z0-9]/g) || []).filter(isModelLike);
-    return words.find((w) => w.includes('-')) || words[0] || '';
+    // 小数点を含む語（USB3.2-Gen1 / Bluetooth5.3）は規格名。語の途中で切ると「2-Gen1」を型番と取り違えるので、点ごと拾って外す
+    const words = (toHalf(stripShout(String(title || ''))).match(/[A-Za-z0-9][A-Za-z0-9.-]{2,22}[A-Za-z0-9]/g) || [])
+      .filter((w) => !w.includes('.') && isModelLike(w));
+    // ハイフンを含む語のうち最も長いもの（Wi-Fi6 より WSR-3000AX4P-BK）。無ければ最初の語
+    const hyphened = words.filter((w) => w.includes('-')).sort((x, y) => y.length - x.length);
+    return hyphened[0] || words[0] || '';
   }
 
   /**
@@ -219,7 +235,8 @@
    * 取り違えを避けるため、こちらの型番も候補の型番もハイフンを含む（型番らしさの強い）ときだけ見る。
    */
   function conflictsModel(model, title) {
-    if (!model || !model.includes('-') || titleHasModel(model, title)) return false;
+    // 短い型番（PET-24 のような品番・規格名と紛らわしいもの）では外さない
+    if (!model || !model.includes('-') || model.length < 7 || titleHasModel(model, title)) return false;
     const words = toHalf(title).match(/[A-Za-z0-9][A-Za-z0-9-]{2,22}[A-Za-z0-9]/g) || [];
     return words.some((w) => w.includes('-') && isModelLike(w));
   }
@@ -249,5 +266,5 @@
     return { label: 'の似た商品', badge: '参考', sure: false };
   }
 
-  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, packCount, samePack, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel, conflictsModel, splitByModel };
+  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, packCount, samePack, isUsed, sameCondition, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel, conflictsModel, splitByModel };
 })();

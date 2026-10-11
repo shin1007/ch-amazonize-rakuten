@@ -138,7 +138,7 @@
       : '';
 
     if (r.status === 'ok' && r.item) {
-      const { sure, badge } = matchLabel({ byJan: r.byJan, byModel: r.byModel, score: r.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.title, r.item.title) });
+      const { sure, badge } = matchLabel({ byJan: r.byJan, byModel: r.byModel, score: r.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.pageTitle || data.title, r.item.title) });
       const how = r.byJan ? tr('JANコード {jan} で検索した結果', { jan: data.jan })
         : r.byModel ? tr('型番「{q}」で検索した結果', { q: r.query })
         : tr('商品名「{q}」で検索した結果（商品名の一致度 {score}）', { q: r.query, score: r.item.score });
@@ -180,7 +180,7 @@ ${how}` },
     const pick = [results.code, results.title].find((r) => r?.status === 'ok' && r.item);
     let diff = '';
     if (pick) {
-      const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.title, pick.item.title) });
+      const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.pageTitle || data.title, pick.item.title) });
       diff = diffLine(site, data, pick.item.price, sure, home);
     }
     box.replaceChildren(
@@ -201,13 +201,14 @@ ${how}` },
 
   /**
    * anchor の下に、店ごとの欄を sites の順に積む。data は { title, minPrice, maxPrice, jan, variants, descriptionHtml }。
+   * pageTitle があれば、まとめ売りの数と型番はそちら（ページに出ている元の商品名）で見る（title は検索用に整えた名前のことがある）。
    * 返すのは置いた欄（ページに描き直されて外れたら、呼んだ側が置き直す）と、結果がそろうと解決する done、
    * data の価格を書き換えたあとに値差を出し直す repaint。
    */
   function mount(anchor, data, sites, home) {
     // 引く手がかり: JANがあればJAN、無ければ商品名や説明から拾った型番
     // 型番はJANがあっても拾っておく（JANで見つからないときの引き直しと、名前で引いた候補の絞り込みに使う）
-    const model = AZR.amazon.extractModel(data.title, data.descriptionHtml || []);
+    const model = AZR.amazon.extractModel(data.pageTitle || data.title, data.descriptionHtml || []);
     const code = AZR.amazon.isJan(data.jan) ? { type: 'JAN' } : model ? { type: '型番' } : { type: '' };
 
     // 店ごとに欄を1つ。価格の下に sites の順で積む
