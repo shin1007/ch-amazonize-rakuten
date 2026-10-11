@@ -488,6 +488,7 @@ async function amazonLookupRaw({ title, jan, model, hint = '' }) {
   if (items.length || hasAnyResultFrame(mainResults(got.html))) {
     health.check('amazon.searchParse', items.length > 0, `商品の枠はあるのに読めない（${query}）`);
   }
+  items = AZR.amazon.sameCondition(title, items);
   if (!items.length) return { status: 'none', query, searchUrl };
 
   if (useJan) {
@@ -1337,7 +1338,7 @@ async function yahooPrice({ title, jan, model, hint = '' }) {
     const items = (res.items || []).filter((it) => it.itemPrice > 0).map((it) => ({
         title: it.itemName, price: it.itemPrice, url: it.affiliateUrl || it.itemUrl, image: it.imageUrl,
         rating: it.rating || 0, count: it.reviewCount || 0, score: AZR.amazon.scoreMatch(title, it.itemName)
-    }));
+    })).filter((it, _, all) => AZR.amazon.sameCondition(title, all).includes(it));
     if (!items.length) return { status: 'none', query, searchUrl };
     if (useJan) return { status: 'ok', query, searchUrl, byJan: true, item: items[0] };
     const best = (list) => list.reduce((a, b) => (!a || b.score > a.score ? b : a), null);
@@ -1384,7 +1385,7 @@ async function rakutenPrice({ title, jan, model, hint = '' }) {
     const items = (res.items || []).filter((it) => it.itemPrice > 0).map((it) => ({
         title: it.itemName, price: it.itemPrice, url: it.affiliateUrl || it.itemUrl, image: it.imageUrl,
         shop: it.shopCode || '', score: AZR.amazon.scoreMatch(title, it.itemName)
-    }));
+    })).filter((it, _, all) => AZR.amazon.sameCondition(title, all).includes(it));
     // JANは語として引くので、説明に別の商品のJANまで並べた店の商品も当たる。名前の重なりが極端に低いものは外す
     const topScore = Math.max(0, ...items.map((it) => it.score));
     const ranked = useJan ? items.filter((it) => it.score >= topScore / 2).sort((a, b) => a.price - b.price)

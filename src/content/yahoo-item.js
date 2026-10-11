@@ -81,6 +81,8 @@
     const jan = item.isJanCodeActive === false ? '' : String(item.janCode || '');
     const data = {
         title: await betterTitle(clean(item.name), jan),
+        // 「2kg 2個セット」のような数や型番は、他店の名前に置き換える前の、このページの商品名で見る
+        pageTitle: clean(item.name),
         minPrice: prices.length ? Math.min(...prices) : Number(item.applicablePrice) || null,
         maxPrice: prices.length ? Math.max(...prices) : null,
         jan,

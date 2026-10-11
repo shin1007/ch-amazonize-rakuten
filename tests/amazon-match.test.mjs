@@ -358,3 +358,49 @@ test('AmazonがJANに「一致する結果はありません」と答えたら�
   assert.equal(res.item.price, 1480);
   assert.equal(calls.length, 2); // JANで1回（読み直さない）、型番で1回
 });
+
+/* 中古・セット数・型番の拾い方（実ページを回して見つけた取り違え） ---------------- */
+
+test('新品には中古・整備済み品を当てない（こちらが中古なら残す）', () => {
+  const { sameCondition } = AZR.amazon;
+  const items = [
+    { title: '【中古】ノルウェイの森 上/ 村上春樹 (文庫)' },
+    { title: '【整備済み品】 任天堂 Nintendo Switch(有機ELモデル) ホワイト' },
+    { title: '【未使用】Nintendo Switch Joy-Con(L)/(R) ホワイト(有機ELモデル)' },
+    { title: '【未使用/未開封】Dyson Supersonic Travelヘアドライヤー HD19' },
+    { title: 'ノルウェイの森 上 (講談社文庫)' }
+  ];
+  assert.deepEqual(sameCondition('ノルウェイの森 上/村上春樹', items).map((i) => i.title), ['ノルウェイの森 上 (講談社文庫)']);
+  assert.equal(sameCondition('【中古】iPhone 13 128GB Aランク', items).length, 5);
+});
+
+test('JANで引いた楽天の最安が中古なら、新品を選ぶ', async () => {
+  const items = [
+    { itemName: '【中古】Nintendo Switch (有機ELモデル) ホワイト HEG-S-KAAAA', itemPrice: 27800, itemUrl: 'https://item.rakuten.co.jp/u/1/', shopCode: 'u' },
+    { itemName: '【新品】任天堂 Nintendo Switch 有機ELモデル ホワイト HEG-S-KAAAA', itemPrice: 50700, itemUrl: 'https://item.rakuten.co.jp/n/2/', shopCode: 'n' }
+  ];
+  const s = loadServiceWorker({
+    fetch: async (url) => (String(url).startsWith('https://www.rakuten.co.jp/')
+      ? { type: 'basic', ok: true, status: 200 }
+      : { ok: true, status: 200, json: async () => ({ count: 2, items }) })
+  });
+  const res = await s.rakutenPrice({ title: 'Nintendo Switch本体(有機ELモデル) ホワイト HEG-S-KAAAA', jan: '4902370548495', model: '' });
+  assert.equal(res.item.price, 50700);
+});
+
+test('「1ケース（20食）」と「78g×20個」は同じ数。「24本入」も数として拾う', () => {
+  const { packCount, samePack } = AZR.amazon;
+  assert.equal(samePack('日清食品 カップヌードル 78g 1ケース（20食）', 'カップヌードル レギュラー 日清食品 カップ麺 78g×20個'), true);
+  assert.equal(packCount('お茶 525ml 24本入'), 24);
+  assert.equal(packCount('温泡 こだわりローズ 20錠入×2'), 1);
+  assert.equal(samePack('コカコーラ 綾鷹 525 ml PET × 48本 [24本×2箱]', 'コカコーラ 無糖茶 選べる2ケースセット 525mlペットボトル×48(24×2)本入'), true);
+  assert.equal(packCount('[新品]ノルウェイの森 上下巻セット [文庫版] (全2冊)'), 2);
+});
+
+test('規格名（USB3.2-Gen1・Wi-Fi6・COVID-19）を型番と取り違えない', () => {
+  const { extractModel } = AZR.amazon;
+  assert.equal(extractModel('エレコム USB3.2-Gen1 ハブ 4ポート U3H-A416BBK'), 'U3H-A416BBK');
+  assert.equal(extractModel('Wi-Fi6 ルーター 無線LAN 11ax AX3000 WSR-3000AX4P-BK'), 'WSR-3000AX4P-BK');
+  assert.equal(extractModel('COVID-19 抗原検査キット'), '');
+  assert.equal(extractModel('ワイヤレスイヤホン Bluetooth5.3 IPX7 防水'), '');
+});
