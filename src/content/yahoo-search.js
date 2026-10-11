@@ -1,4 +1,4 @@
-/* Amazonize Rakuten - Yahoo!ショッピングの検索結果: 広告（PR）の商品を目立たなくする
+/* Amazonize Rakuten - Yahoo!ショッピングの検索結果・カテゴリ一覧: 広告（PR）の商品を目立たなくする
  * 楽天の検索結果（search.js）と同じ見た目・同じ設定（simplifySearch）。消さずに薄くするだけ。
  * PRの印は商品画像の上の [class*="imageIcon--pr"]。その画像の枠の親が商品1件の枠。 */
 (async () => {

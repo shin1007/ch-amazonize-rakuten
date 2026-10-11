@@ -250,7 +250,7 @@ const isYahoo = (url) => /(^|\.)shopping\.yahoo\.co\.jp$/.test(new URL(url).host
  */
 async function runYahoo(page, name, url, logs) {
   const report = { url };
-  if (new URL(url).pathname.startsWith('/search')) {
+  if (/^\/(search|category)/.test(new URL(url).pathname)) {
     await page.waitForSelector('.azr-ad-item', { timeout: 15000 }).catch(() => logs.push('harness: PRの商品が薄くならない'));
     Object.assign(report, await page.evaluate(() => ({
       pr: document.querySelectorAll('[class*="imageIcon--pr"]').length,

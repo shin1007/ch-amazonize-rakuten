@@ -57,3 +57,35 @@ test('中継サーバーが答えないときは error', async () => {
   const res = await s.rakutenPrice({ title: 'スカルプD シャンプー 350ml', jan: '', model: '' });
   assert.equal(res.status, 'error');
 });
+
+/* 送料と、中継サーバーへの問い合わせのまとめ方 --------------------------------- */
+
+test('楽天は送料込み/送料別、Yahoo!は送料無料/条件付きを付けて返す', async () => {
+  const s = loadServiceWorker({
+    fetch: async (url) => (String(url).startsWith('https://www.rakuten.co.jp/')
+      ? { type: 'basic', ok: true, status: 200 }
+      : { ok: true, status: 200, json: async () => ({ count: 1, items: [{ ...ITEMS[2], postageFlag: 0 }] }) })
+  });
+  const res = await s.rakutenPrice({ title: 'スカルプD 薬用スカルプシャンプー オイリー 350ml', jan: '4580688635054', model: '' });
+  assert.deepEqual({ ...res.item.shipping }, { kind: 'free', fee: 0 });
+  assert.deepEqual({ ...s.rakutenShipping(1) }, { kind: 'separate', fee: null });
+  assert.deepEqual({ ...s.yahooShipping(3) }, { kind: 'conditional', fee: null });
+  assert.equal(s.yahooShipping(1), null);
+});
+
+test('同じ問い合わせは1回の通信にまとめ、制限（429）に当たったら1度だけ待って引き直す', async () => {
+  const calls = [];
+  let first = true;
+  const s = loadServiceWorker({
+    fetch: async (url) => {
+      calls.push(String(url));
+      if (first) { first = false; return { ok: false, status: 429, json: async () => ({ error: 'rate_limited' }) }; }
+      return { ok: true, status: 200, json: async () => ({ count: 0, items: [] }) };
+    }
+  });
+  const [a, b] = await Promise.all([s.rlSearch('スカルプD シャンプー'), s.rlSearch('スカルプD シャンプー')]);
+  assert.equal(a.count, 0);
+  assert.equal(b.count, 0);
+  await s.rlSearch('スカルプD シャンプー');
+  assert.equal(calls.length, 2); // 429 の1回と、引き直しの1回だけ
+});

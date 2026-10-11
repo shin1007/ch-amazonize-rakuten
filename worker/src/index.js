@@ -28,8 +28,9 @@ async function callRakuten(keyword, env) {
         const j = await r.json();
         return {
             count: j.count ?? 0,
-            items: (j.Items || j.items || []).map(x => x.Item || x.item || x).map(({ itemName, itemPrice, itemUrl, affiliateUrl, shopName, shopCode, mediumImageUrls }) =>
-                ({ itemName, itemPrice, itemUrl, affiliateUrl, shopName, shopCode, imageUrl: mediumImageUrls?.[0]?.imageUrl || mediumImageUrls?.[0] || '' }))
+            // postageFlag: 0 は送料込み、1 は送料別（金額はAPIに無い）
+            items: (j.Items || j.items || []).map(x => x.Item || x.item || x).map(({ itemName, itemPrice, itemUrl, affiliateUrl, shopName, shopCode, mediumImageUrls, postageFlag }) =>
+                ({ itemName, itemPrice, itemUrl, affiliateUrl, shopName, shopCode, imageUrl: mediumImageUrls?.[0]?.imageUrl || mediumImageUrls?.[0] || '', postageFlag }))
         };
     }
     return { error: 'too_many_requests' };
@@ -68,10 +69,11 @@ async function callYahoo({ keyword, jan }, env) {
         const j = await r.json();
         return {
             count: j.totalResultsAvailable ?? 0,
-            items: (j.hits || []).map(({ name, price, url, seller, image, review, janCode }) => ({
+            // shippingCode: 1 は設定なし、2 は送料無料、3 は条件付き送料無料（金額はAPIに無い）
+            items: (j.hits || []).map(({ name, price, url, seller, image, review, janCode, shipping }) => ({
                 itemName: name, itemPrice: price, itemUrl: url, affiliateUrl: vcLink(url, env) || undefined,
                 shopName: seller?.name || '', imageUrl: image?.medium || image?.small || '',
-                rating: review?.rate || 0, reviewCount: review?.count || 0, janCode: janCode || ''
+                rating: review?.rate || 0, reviewCount: review?.count || 0, janCode: janCode || '', shippingCode: shipping?.code || 0
             }))
         };
     }
@@ -80,15 +82,27 @@ async function callYahoo({ keyword, jan }, env) {
 
 const yahooSearchPage = (q) => `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(q)}`;
 
-async function handleYahoo(url, env, ctx) {
+/**
+ * 回数制限（同じIPから1分60回）。キャッシュに当たった応答は外部APIを呼ばないので数えない
+ * （商品ページを続けて開くと、同じ検索語の問い合わせが重なって制限に当たっていた）。
+ */
+async function limited(request, env) {
+    if (!env.LIMITER) return null;
+    const { success } = await env.LIMITER.limit({ key: request.headers.get('cf-connecting-ip') || 'unknown' });
+    return success ? null : json({ error: 'rate_limited' }, 429);
+}
+
+async function handleYahoo(url, env, ctx, request) {
     if (!env.YAHOO_APP_ID) return json({ error: 'not_configured' }, 503);
     const jan = (url.searchParams.get('jan') || '').replace(/\D/g, '');
     const keyword = (url.searchParams.get('keyword') || '').replace(/\s+/g, ' ').trim();
     if (jan ? !/^(\d{8}|\d{13})$/.test(jan) : (keyword.length < 2 || keyword.length > 128)) return json({ error: 'bad_keyword' }, 400);
 
-    const cacheKey = new Request(`${url.origin}/yahoo?v=1&${jan ? `jan=${jan}` : `keyword=${encodeURIComponent(keyword)}`}`);
+    const cacheKey = new Request(`${url.origin}/yahoo?v=2&${jan ? `jan=${jan}` : `keyword=${encodeURIComponent(keyword)}`}`);
     const cached = await caches.default.match(cacheKey);
     if (cached) return cached;
+    const over = await limited(request, env);
+    if (over) return over;
 
     const result = await callYahoo({ keyword, jan }, env);
     const page = yahooSearchPage(jan || keyword);
@@ -107,19 +121,17 @@ export default {
         }
         if (request.method !== 'GET' || (url.pathname !== '/search' && url.pathname !== '/yahoo')) return json({ error: 'not_found' }, 404);
 
-        if (env.LIMITER) {
-            const { success } = await env.LIMITER.limit({ key: request.headers.get('cf-connecting-ip') || 'unknown' });
-            if (!success) return json({ error: 'rate_limited' }, 429);
-        }
-        if (url.pathname === '/yahoo') return handleYahoo(url, env, ctx);
+        if (url.pathname === '/yahoo') return handleYahoo(url, env, ctx, request);
 
         const keyword = (url.searchParams.get('keyword') || '').replace(/\s+/g, ' ').trim();
         if (keyword.length < 2 || keyword.length > 128) return json({ error: 'bad_keyword' }, 400);
 
         // 正規化したキーワードでキャッシュ
-        const cacheKey = new Request(`${url.origin}/search?v=7&keyword=${encodeURIComponent(keyword)}`);
+        const cacheKey = new Request(`${url.origin}/search?v=8&keyword=${encodeURIComponent(keyword)}`);
         const cached = await caches.default.match(cacheKey);
         if (cached) return cached;
+        const over = await limited(request, env);
+        if (over) return over;
 
         const result = await callRakuten(keyword, env);
         result.searchUrl = searchPageUrl(keyword, env);

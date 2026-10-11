@@ -14,7 +14,7 @@
 | 同じ商品がAmazonでいくらかを価格の下に表示 | `item.rakuten.co.jp` | ON |
 | 商品画像を←→キーで送る（拡大表示の中でも送れる。Escで閉じる） | `store.shopping.yahoo.co.jp` | ON |
 | 同じ商品がAmazon・楽天でいくらかを価格の下に表示 | `store.shopping.yahoo.co.jp` | ON |
-| 検索結果の広告（PR）を目立たなくする | `shopping.yahoo.co.jp/search` | ON（楽天の検索結果と同じ設定） |
+| 検索結果・カテゴリ一覧の広告（PR）を目立たなくする | `shopping.yahoo.co.jp/search`・`/category` | ON（楽天の検索結果と同じ設定） |
 | 検索結果の広告枠を目立たなくする | `search.rakuten.co.jp` | ON |
 | かごの合計金額パネル（ポイント差引後の実質価格つき） | `cart.step.rakuten.co.jp/cart` | ON |
 | 商品ページのクーポンをその場で獲得 | `item.rakuten.co.jp` | ON |
