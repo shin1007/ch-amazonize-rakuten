@@ -432,6 +432,17 @@ async function noAffiliate() {
   try { return Boolean((await chrome.storage.sync.get({ noAffiliate: false })).noAffiliate); } catch { return false; }
 }
 
+/**
+ * JANで引いて見つからなければ、型番で引き直す（Amazonは扱っていない商品のJANには何も返さないが、
+ * 同じ商品が型番違い（色・販路の記号違い）で並んでいることがある）。lookup は amazonLookup・yahooPrice・rakutenPrice。
+ */
+async function janThenModel(lookup, args) {
+  const r = await lookup(args);
+  if (r.status !== 'none' || !AZR.amazon.isJan(args.jan) || !args.model) return r;
+  const byModel = await lookup({ ...args, jan: '' });
+  return byModel.status === 'ok' ? byModel : r;
+}
+
 async function amazonLookup(args) {
   const r = await amazonLookupRaw(args);
   if (await noAffiliate()) {
@@ -443,7 +454,9 @@ async function amazonLookup(args) {
   return r;
 }
 
-async function amazonLookupRaw({ title, jan, model }) {
+const AMAZON_NO_RESULTS = /検索クエリに一致する結果はありません|No results for/;
+
+async function amazonLookupRaw({ title, jan, model, hint = '' }) {
   const useJan = AZR.amazon.isJan(jan);
   const useModel = !useJan && Boolean(model);
   const query = useJan ? String(jan) : useModel ? String(model) : AZR.amazon.buildQuery(title);
@@ -462,6 +475,8 @@ async function amazonLookupRaw({ title, jan, model }) {
    * それは応答の不調ではなく、検索語に一致する商品が無いという答えそのもの。
    */
   let items = parseAmazonSearch(got.html);
+  // 「検索クエリに一致する結果はありません」と答えた（JANで引いて、Amazonがその商品を扱っていない）。読み直しても同じ
+  if (!items.length && AMAZON_NO_RESULTS.test(got.html)) return { status: 'none', query, searchUrl };
   if (!items.length && !hasAnyResultFrame(got.html)) {
     await new Promise((r) => setTimeout(r, AMAZON_RETRY_MS));
     got = await amazonFetch(searchUrl);
@@ -495,9 +510,16 @@ async function amazonLookupRaw({ title, jan, model }) {
     if (hit) return { status: 'ok', query, searchUrl, byModel: true, item: hit };
   }
 
+  // 名前で引いたとき、こちらの型番が商品名に入っている候補があれば、それが同じ商品。違う型番の候補は外す
+  const { exact, rest } = AZR.amazon.splitByModel(items, hint);
+  if (exact.length) {
+    const hit = exact.map((it) => ({ ...it, score: AZR.amazon.scoreMatch(title, it.title) })).reduce((a, b) => (b.score > a.score ? b : a));
+    return { status: 'ok', query, searchUrl, byModel: true, item: hit };
+  }
+
   // 名前で引いたときは、商品名がいちばん重なるものを選ぶ（先頭が一番近いとは限らない）
   let best = null;
-  for (const it of items) {
+  for (const it of rest) {
     const score = AZR.amazon.scoreMatch(title, it.title);
     if (!best || score > best.score) best = { ...it, score };
   }
@@ -506,16 +528,17 @@ async function amazonLookupRaw({ title, jan, model }) {
 }
 
 /** 価格は日単位で動くが、同じ商品ページを開き直すたびに読みに行く必要は無い。 */
-async function amazonPrice({ title, jan, model }) {
+async function amazonPrice({ title, jan, model, hint = '' }) {
   // v2: リンクを中継ページ経由にした（v1 のキャッシュには、Amazon直リンクが入っている）
   // v3: まとめ売りの数が違う商品の一致度を下げた（v2 のキャッシュには、1個売りに当てた「2点セット」が残っている）
-  const key = AZR.amazon.isJan(jan) ? `v3:jan:${jan}` : model ? `v3:m:${model}:${AZR.amazon.buildQuery(title)}` : `v3:q:${AZR.amazon.buildQuery(title)}`;
+  // JANで引くときも型番（JANで無いときの引き直しに使う）を、名前で引くときも型番の手がかり（hint）をキーに入れる
+  const key = AZR.amazon.isJan(jan) ? `v3:jan:${jan}:${model || ''}` : model ? `v3:m:${model}:${AZR.amazon.buildQuery(title)}` : `v3:q:${AZR.amazon.buildQuery(title)}:${hint}`;
   const { azrAmazon: cache = {} } = await chrome.storage.local.get('azrAmazon');
   const now = Date.now();
   const hit = cache[key];
   if (hit && now - hit.at < AMAZON_TTL_MS) return { ...hit.result, cached: true };
 
-  const result = await amazonLookup({ title, jan, model });
+  const result = await janThenModel(amazonLookup, { title, jan, model, hint });
   // 弾かれた・通信に失敗した・空で返った、は覚えない（次に開いたときは読みに行く）
   if ((result.status === 'ok' || result.status === 'none') && !result.empty) {
     for (const [k, v] of Object.entries(cache)) if (now - v.at >= AMAZON_TTL_MS) delete cache[k];
@@ -1198,12 +1221,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const title = String(msg.title || '');
     const jan = msg.jan ? String(msg.jan) : '';
     const model = msg.model ? String(msg.model) : '';
+    const hint = msg.hint ? String(msg.hint) : '';
     if (!title) {
       sendResponse({ status: 'error' });
       return false;
     }
     // 読み直しを挟むと30秒近くかかることがある。その間 service worker を止めさせない。
-    holdAwake(() => amazonPrice({ title, jan, model }))
+    holdAwake(() => amazonPrice({ title, jan, model, hint }))
       .then(sendResponse)
       .catch((e) => { console.warn('[AZR] Amazonの価格を取れない:', e); sendResponse({ status: 'error' }); });
     return true; // 非同期応答
@@ -1292,7 +1316,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * 楽天の商品ページ用: Yahoo!ショッピングでの価格。返す形は amazonPrice と同じ（item-amazon.js がそのまま描く）。
  * 引き方も同じで、JAN → 型番 → 商品名の重なり。JANで引くと安い順に返るので、先頭が同じ商品の最安。
  */
-async function yahooPrice({ title, jan, model }) {
+async function yahooPrice({ title, jan, model, hint = '' }) {
     const useJan = AZR.amazon.isJan(jan);
     const useModel = !useJan && Boolean(model);
     const query = useJan ? String(jan) : useModel ? String(model) : AZR.amazon.buildQuery(title);
@@ -1321,14 +1345,17 @@ async function yahooPrice({ title, jan, model }) {
         const hit = best(items.filter((it) => AZR.amazon.titleHasModel(model, it.title)));
         if (hit) return { status: 'ok', query, searchUrl, byModel: true, item: hit };
     }
-    const top = best(items);
+    // 名前で引いたとき、こちらの型番が入っている候補があればそれが同じ商品。違う型番の候補は外す
+    const { exact, rest } = AZR.amazon.splitByModel(items, hint);
+    if (exact.length) return { status: 'ok', query, searchUrl, byModel: true, item: best(exact) };
+    const top = best(rest);
     if (!top || top.score < AMAZON_MIN_SCORE) return { status: 'none', query, searchUrl };
     return { status: 'ok', query, searchUrl, byJan: false, item: top };
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.type !== 'azr:yahooPrice' || !msg.title) return;
-    yahooPrice({ title: String(msg.title), jan: msg.jan ? String(msg.jan) : '', model: msg.model ? String(msg.model) : '' })
+    janThenModel(yahooPrice, { title: String(msg.title), jan: msg.jan ? String(msg.jan) : '', model: msg.model ? String(msg.model) : '', hint: msg.hint ? String(msg.hint) : '' })
         .then(sendResponse)
         .catch((e) => { console.warn('[AZR] Yahoo!ショッピングの価格を取れない:', e); sendResponse({ status: 'error' }); });
     return true;
@@ -1340,7 +1367,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * （同じJANのまとめ売りは高い方に来る）。閉店・改装中の店舗の商品は選ばない。
  * Amazonと違い、価格は覚えておかない（中継Workerが1時間キャッシュしている）。
  */
-async function rakutenPrice({ title, jan, model }) {
+async function rakutenPrice({ title, jan, model, hint = '' }) {
     const useJan = AZR.amazon.isJan(jan);
     const useModel = !useJan && Boolean(model);
     const query = useJan ? String(jan) : useModel ? String(model) : AZR.amazon.buildQuery(title);
@@ -1363,7 +1390,10 @@ async function rakutenPrice({ title, jan, model }) {
     const ranked = useJan ? items.filter((it) => it.score >= topScore / 2).sort((a, b) => a.price - b.price)
         : useModel ? items.filter((it) => AZR.amazon.titleHasModel(model, it.title)).sort((a, b) => b.score - a.score)
         : [];
-    const byName = items.filter((it) => it.score >= AMAZON_MIN_SCORE).sort((a, b) => b.score - a.score);
+    // 名前で引いたとき、こちらの型番が入っている候補を先に、違う型番の候補は外す
+    const { exact, rest } = AZR.amazon.splitByModel(items, hint);
+    const byName = [...[...exact].sort((a, b) => b.score - a.score),
+        ...rest.filter((it) => !exact.includes(it) && it.score >= AMAZON_MIN_SCORE).sort((a, b) => b.score - a.score)];
     // 上から順に、店が開いているものを選ぶ（判定できないときは開いているとみなす）
     const firstOpen = async (list) => {
         for (const it of list.slice(0, 5)) {
@@ -1376,12 +1406,12 @@ async function rakutenPrice({ title, jan, model }) {
     if (hit) return { status: 'ok', query, searchUrl, byJan: useJan, byModel: useModel, item: strip(hit) };
     const top = await firstOpen(byName);
     if (!top) return { status: 'none', query, searchUrl };
-    return { status: 'ok', query, searchUrl, byJan: false, item: strip(top) };
+    return { status: 'ok', query, searchUrl, byJan: false, byModel: exact.includes(top), item: strip(top) };
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.type !== 'azr:rakutenPrice' || !msg.title) return;
-    rakutenPrice({ title: String(msg.title), jan: msg.jan ? String(msg.jan) : '', model: msg.model ? String(msg.model) : '' })
+    janThenModel(rakutenPrice, { title: String(msg.title), jan: msg.jan ? String(msg.jan) : '', model: msg.model ? String(msg.model) : '', hint: msg.hint ? String(msg.hint) : '' })
         .then(sendResponse)
         .catch((e) => { console.warn('[AZR] 楽天の価格を取れない:', e); sendResponse({ status: 'error' }); });
     return true;

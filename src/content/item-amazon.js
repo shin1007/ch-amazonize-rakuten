@@ -206,7 +206,8 @@ ${how}` },
    */
   function mount(anchor, data, sites, home) {
     // 引く手がかり: JANがあればJAN、無ければ商品名や説明から拾った型番
-    const model = AZR.amazon.isJan(data.jan) ? '' : AZR.amazon.extractModel(data.title, data.descriptionHtml || []);
+    // 型番はJANがあっても拾っておく（JANで見つからないときの引き直しと、名前で引いた候補の絞り込みに使う）
+    const model = AZR.amazon.extractModel(data.title, data.descriptionHtml || []);
     const code = AZR.amazon.isJan(data.jan) ? { type: 'JAN' } : model ? { type: '型番' } : { type: '' };
 
     // 店ごとに欄を1つ。価格の下に sites の順で積む
@@ -239,7 +240,7 @@ ${how}` },
     };
     await Promise.all([
       code.type ? ask({ jan: data.jan || '', model }).then((r) => settle('code', r)) : null,
-      ask({ jan: '', model: '' }).then((r) => settle('title', r))
+      ask({ jan: '', model: '', hint: model }).then((r) => settle('title', r))
     ]);
     if (!box.isConnected) return; // 待つあいだに元のページへ戻した
     document.documentElement.dataset[`azr${site.key[0].toUpperCase()}${site.key.slice(1)}`] = box.dataset.state; // 検証用の目印

@@ -242,7 +242,7 @@ test('同じ商品を開き直しても読みに行かない（結果は覚え�
   assert.equal(calls.length, 1);
   assert.equal(second.cached, true);
   assert.equal(second.item.asin, first.item.asin);
-  assert.ok(storage.azrAmazon['v3:jan:4580688635054']);
+  assert.ok(storage.azrAmazon['v3:jan:4580688635054:']);
 });
 
 const EMPTY_HTML = '<!doctype html><html><body><div class="s-main-slot"></div></body></html>';
@@ -306,4 +306,55 @@ test('1個売りに2点セットが当たったら、名前の一致度を下げ
   assert.equal(r.sure, false);
   assert.equal(r.badge, 'セット数が違う');
   assert.equal(matchLabel({ byJan: true, pack: AZR.amazon.samePack(one, one) }).sure, true);
+});
+
+/* 型番で候補を絞る・JANで無ければ型番で引き直す ------------------------------- */
+
+const LAN = 'バッファロー（Buffalo） Giga対応 Type-A USB 3.2 (Gen1)用 LANアダプター LUA6-U3-AGTE-BK';
+
+test('末尾の色・販路の記号だけ違う型番は同じ型番とみなし、別の型番が書いてある候補は外す', () => {
+  const { titleHasModel, conflictsModel } = AZR.amazon;
+  assert.equal(titleHasModel('LUA6-U3-AGTE-BK', 'バッファロー 有線LANアダプター Giga Type-A USB3.2(Gen1)対応 ブラック LUA6-U3-AGTE-NBK'), true);
+  assert.equal(titleHasModel('LUA6-U3-AGTE-BK', 'バッファロー LUA6-U2-ATX'), false);
+  const hub = 'バッファロー USB-C ハブ ドッキングステーション 6-in-1 100W USB PD HDMI 4K VGA LANポート LUD-U3-CU302SV/N';
+  assert.equal(conflictsModel('LUA6-U3-AGTE-BK', hub), true);
+  assert.equal(conflictsModel('LUA6-U3-AGTE-BK', 'バッファロー 有線LANアダプター Giga Type-A ブラック'), false); // 型番が書いていないものは残す
+  assert.equal(conflictsModel('', hub), false);
+});
+
+const HUB_AND_LAN_HTML = `<!doctype html><html><body><div class="s-main-slot">
+${result({ asin: 'B0HUB00001', title: 'バッファロー USB-C ハブ ドッキングステーション 6-in-1 100W Type-C Type-A USB 3.2 Gen1 LANポート LUD-U3-CU302SV/N', price: '14,940', listPrice: '16,000', rating: '4.1', count: '20' })}
+${result({ asin: 'B0LAN00001', title: 'バッファロー 有線LANアダプター Giga Type-A USB3.2(Gen1)対応 ブラック LUA6-U3-AGTE-NBK', price: '1,480', listPrice: '2,000', rating: '4.4', count: '148' })}
+</div></body></html>`;
+
+test('名前で引いたとき、こちらの型番が入っている候補を「型番が一致」として選ぶ', async () => {
+  const s = loadServiceWorker({ fetch: stubFetch(HUB_AND_LAN_HTML) });
+  const res = await s.amazonLookup({ title: LAN, hint: 'LUA6-U3-AGTE-BK' });
+  assert.equal(res.status, 'ok');
+  assert.equal(res.byModel, true);
+  assert.equal(res.item.price, 1480);
+});
+
+test('名前で引いたとき、別の型番の候補しか無ければ「見つからない」', async () => {
+  const onlyHub = `<!doctype html><html><body><div class="s-main-slot">
+${result({ asin: 'B0HUB00001', title: 'バッファロー USB-C ハブ ドッキングステーション 6-in-1 100W Type-C Type-A USB 3.2 Gen1 LANポート LUD-U3-CU302SV/N', price: '14,940', listPrice: '16,000', rating: '4.1', count: '20' })}
+</div></body></html>`;
+  const s = loadServiceWorker({ fetch: stubFetch(onlyHub) });
+  const res = await s.amazonLookup({ title: LAN, hint: 'LUA6-U3-AGTE-BK' });
+  assert.equal(res.status, 'none');
+});
+
+test('AmazonがJANに「一致する結果はありません」と答えたら、読み直さずに型番で引き直す', async () => {
+  const calls = [];
+  const NO_RESULTS = '<!doctype html><html><body><div class="s-main-slot">検索クエリに一致する結果はありません。</div></body></html>';
+  const fetch = async (url) => {
+    calls.push(String(url));
+    return { ok: true, status: 200, text: async () => (/4981254077078/.test(url) ? NO_RESULTS : HUB_AND_LAN_HTML) };
+  };
+  const s = loadServiceWorker({ fetch, storage: {} });
+  const res = await s.amazonPrice({ title: LAN, jan: '4981254077078', model: 'LUA6-U3-AGTE-BK' });
+  assert.equal(res.status, 'ok');
+  assert.equal(res.byModel, true);
+  assert.equal(res.item.price, 1480);
+  assert.equal(calls.length, 2); // JANで1回（読み直さない）、型番で1回
 });
