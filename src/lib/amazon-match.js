@@ -82,6 +82,25 @@
   }
 
   /**
+   * まとめ売りの数（"2点セット" "3個組" "350ml×2本"）。書いていなければ1。
+   * 同じ商品名の1個売りと2個セットは値段が倍違うので、数が食い違えば別の商品として扱う
+   * （Yahoo!のLANアダプター1個に、Amazonの「2点セット」が当たり、値差を出してしまった）。
+   * 宣伝の括弧（【2点セット【Amazon.co.jp限定】】）の中に書かれることが多いので、宣伝を落とす前の商品名で見る。
+   */
+  const PACK_RES = [
+    /(\d+)\s*(?:点|個|本|袋|箱|缶|パック|枚|足|台)?\s*セット/g,
+    /(\d+)\s*(?:個|本|袋|箱|缶|パック)\s*組/g,
+    /[×xX*]\s*(\d+)\s*(?:個|本|袋|箱|缶|パック|セット)/g
+  ];
+  function packCount(title) {
+    const s = toHalf(title);
+    let n = 1;
+    for (const re of PACK_RES) for (const m of s.matchAll(re)) n = Math.max(n, Number(m[1]) || 1);
+    return n;
+  }
+  const samePack = (a, b) => packCount(a) === packCount(b);
+
+  /**
    * 突き合わせに使う語。日本語は分かち書きしないので、ラテン文字・数字・カタカナ・漢字の
    * まとまりを語とみなす（ひらがなは助詞ばかりで雑音になるので拾わない）。
    *
@@ -153,6 +172,7 @@
     const wantSize = sizeTokens(rakutenTitle);
     const gotSize = sizeTokens(amazonTitle);
     if (wantSize.length && gotSize.length && !wantSize.some((s) => gotSize.includes(s))) score *= 0.5;
+    if (!samePack(rakutenTitle, amazonTitle)) score *= 0.5;
     return Math.round(score * 100) / 100;
   }
 
@@ -189,13 +209,15 @@
    * JANで引いたものは「似た商品」ではなく、同じJANコードの商品そのもの。言い切ってよい。
    * 名前で引いたものは当てずっぽうが混じるので、重なりが薄いか、楽天側が選択肢で
    * 値段の変わる商品（どの選択肢と突き合わせたのか決められない）なら「参考」を付ける。
+   * まとめ売りの数が違う（pack: false）ときは、JAN・型番が合っていても値段は比べられないので sure にしない。
    */
-  function matchLabel({ byJan = false, byModel = false, score = 0, variants = 0 } = {}) {
+  function matchLabel({ byJan = false, byModel = false, score = 0, variants = 0, pack = true } = {}) {
+    if (!pack) return { label: 'の似た商品', badge: 'セット数が違う', sure: false };
     if (byModel) return { label: 'の同じ商品', badge: '型番一致', sure: true };
     if (byJan) return { label: 'の同じ商品', badge: 'JANコード一致', sure: true };
     if (score >= SURE_SCORE && !variants) return { label: 'での価格', badge: null, sure: true };
     return { label: 'の似た商品', badge: '参考', sure: false };
   }
 
-  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel };
+  AZR.amazon = { normalizeTitle, titleTokens, sizeTokens, packCount, samePack, buildQuery, scoreMatch, isJan, matchLabel, extractModel, titleHasModel };
 })();

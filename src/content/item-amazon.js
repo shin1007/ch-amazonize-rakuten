@@ -138,11 +138,12 @@
       : '';
 
     if (r.status === 'ok' && r.item) {
-      const { sure, badge } = matchLabel({ byJan: r.byJan, byModel: r.byModel, score: r.item.score, variants: data.variants?.length || 0 });
+      const { sure, badge } = matchLabel({ byJan: r.byJan, byModel: r.byModel, score: r.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.title, r.item.title) });
       const how = r.byJan ? tr('JANコード {jan} で検索した結果', { jan: data.jan })
         : r.byModel ? tr('型番「{q}」で検索した結果', { q: r.query })
         : tr('商品名「{q}」で検索した結果（商品名の一致度 {score}）', { q: r.query, score: r.item.score });
-      const tag = r.byModel || r.byJan ? tr(r.byModel ? '型番が一致' : badge) : sure ? label : `${label}・${tr('参考')}`;
+      const tag = badge === 'セット数が違う' ? tr(badge)
+        : r.byModel || r.byJan ? tr(r.byModel ? '型番が一致' : badge) : sure ? label : `${label}・${tr('参考')}`;
       const meta = r.item.rating ? `★ ${r.item.rating.toFixed(1)}${r.item.count ? ` (${r.item.count.toLocaleString('ja-JP')})` : ''}` : '';
       return h('div.azr-amz-row', { 'data-state': 'ok' },
         h('a.azr-amazon-item.azr-amz-main', { href: r.item.url, target: '_blank', rel: 'noopener noreferrer', title: `${r.item.title}
@@ -179,7 +180,7 @@ ${how}` },
     const pick = [results.code, results.title].find((r) => r?.status === 'ok' && r.item);
     let diff = '';
     if (pick) {
-      const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0 });
+      const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.title, pick.item.title) });
       diff = diffLine(site, data, pick.item.price, sure, home);
     }
     box.replaceChildren(
