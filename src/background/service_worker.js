@@ -6,14 +6,21 @@ importScripts("/src/lib/amazon-match.js");
 importScripts("/src/lib/health.js");
 const health = AZR.health;
 
-// content script から chrome.storage.session を読めるようにする
+// session storage は content script に開かない（以前は開いていた。その設定が残っていれば戻す）。
+// content script が要る記録（キャンペーンの自動エントリーを1回にする印）は azr:entryOnce で service worker が持つ。
+chrome.storage.session.setAccessLevel?.({ accessLevel: 'TRUSTED_CONTEXTS' })?.catch?.(() => {});
+
+// 店舗ごとのキー（shop:<店舗>）で持っていた閉店判定は azrShops にまとめた。古いキーを消す
 chrome.runtime.onInstalled.addListener(async () => {
   try {
-    await chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS' });
-  } catch (e) {
-    console.warn('[AZR] session storage access level:', e);
-  }
+    const all = await chrome.storage.local.get(null);
+    const old = Object.keys(all || {}).filter((k) => k.startsWith('shop:'));
+    if (old.length) await chrome.storage.local.remove(old);
+  } catch { /* 消せなくても動きは変わらない */ }
 });
+
+// service worker が止まってスキャンが途中で消えたとき、残りの件数がバッジに残らないようにする
+chrome.action.setBadgeText({ text: '' }).catch(() => {});
 
 // 裏のタブはブラウザに実行を絞られるため、獲得ページの遷移が数十秒かかることがある。
 // 早すぎる打ち切りで「失敗」と言わないよう、長めに待つ（成功時は数秒で返る）。
@@ -266,10 +273,14 @@ async function reviewRatings(shopId, itemId) {
   if (item === undefined && shop === undefined) return null;
   const ratings = { item: item ?? null, shop: shop ?? null };
 
-  // 期限切れはここで捨てる（見た商品の数だけ溜まり続けないように）
-  for (const [k, v] of Object.entries(cache)) if (now - v.at >= RATINGS_TTL_MS) delete cache[k];
-  cache[key] = { at: now, ratings };
-  await chrome.storage.local.set({ azrRatings: cache });
+  // 期限切れはここで捨てる（見た商品の数だけ溜まり続けないように）。
+  // 読み直してから書く（複数のタブから同時に来ると、先に書いた分を古い一覧で消すため）
+  await saveCacheSerially(async () => {
+    const { azrRatings: all = {} } = await chrome.storage.local.get('azrRatings');
+    for (const [k, v] of Object.entries(all)) if (now - v.at >= RATINGS_TTL_MS) delete all[k];
+    all[key] = { at: now, ratings };
+    await chrome.storage.local.set({ azrRatings: all });
+  });
   return ratings;
 }
 
@@ -435,7 +446,7 @@ async function noAffiliate() {
 
 /**
  * JANで引いて見つからなければ、型番で引き直す（Amazonは扱っていない商品のJANには何も返さないが、
- * 同じ商品が型番違い（色・販路の記号違い）で並んでいることがある）。lookup は amazonLookup・yahooPrice・rakutenPrice。
+ * 同じ商品が型番違い（色・販路の記号違い）で並んでいることがある）。lookup は amazonLookupRaw・yahooPrice・rakutenPrice。
  */
 async function janThenModel(lookup, args) {
   const r = await lookup(args);
@@ -445,7 +456,12 @@ async function janThenModel(lookup, args) {
 }
 
 async function amazonLookup(args) {
-  const r = await amazonLookupRaw(args);
+  return withAmazonLinks(await amazonLookupRaw(args));
+}
+
+/** 表示するリンクを決める（キャッシュには書き換える前の結果を置く。noAffiliate を切り替えてもすぐ効くように） */
+async function withAmazonLinks(raw) {
+  const r = { ...raw };
   if (await noAffiliate()) {
     if (r.item?.asin) r.item = { ...r.item, url: `https://www.amazon.co.jp/dp/${r.item.asin}` };
     return r;
@@ -561,25 +577,30 @@ async function amazonPrice({ title, jan, model, hint = '' }) {
   // v3: まとめ売りの数が違う商品の一致度を下げた（v2 のキャッシュには、1個売りに当てた「2点セット」が残っている）
   // JANで引くときも型番（JANで無いときの引き直しに使う）を、名前で引くときも型番の手がかり（hint）をキーに入れる
   // v4: 配送料（shipping）を足した
-  const key = AZR.amazon.isJan(jan) ? `v4:jan:${jan}:${model || ''}` : model ? `v4:m:${model}:${AZR.amazon.buildQuery(title)}` : `v4:q:${AZR.amazon.buildQuery(title)}:${hint}`;
+  // v5: リンクを書き換える前の結果を置くようにした（v4 には書き換えた後のリンクが入っている）
+  const key = AZR.amazon.isJan(jan) ? `v5:jan:${jan}:${model || ''}` : model ? `v5:m:${model}:${AZR.amazon.buildQuery(title)}` : `v5:q:${AZR.amazon.buildQuery(title)}:${hint}`;
   const { azrAmazon: cache = {} } = await chrome.storage.local.get('azrAmazon');
   const now = Date.now();
   const hit = cache[key];
-  if (hit && now - hit.at < AMAZON_TTL_MS) return { ...hit.result, cached: true };
+  if (hit && now - hit.at < AMAZON_TTL_MS) return { ...(await withAmazonLinks(hit.result)), cached: true };
 
-  const result = await janThenModel(amazonLookup, { title, jan, model, hint });
+  const result = await janThenModel(amazonLookupRaw, { title, jan, model, hint });
   // 弾かれた・通信に失敗した・空で返った、は覚えない（次に開いたときは読みに行く）
   if ((result.status === 'ok' || result.status === 'none') && !result.empty) {
-    for (const [k, v] of Object.entries(cache)) if (now - v.at >= AMAZON_TTL_MS) delete cache[k];
-    cache[key] = { at: now, result };
-    const keys = Object.keys(cache);
-    if (keys.length > AMAZON_CACHE_MAX) {
-      const oldest = keys.sort((a, b) => cache[a].at - cache[b].at).slice(0, keys.length - AMAZON_CACHE_MAX);
-      for (const k of oldest) delete cache[k];
-    }
-    await chrome.storage.local.set({ azrAmazon: cache });
+    // 読み直してから書く（複数のタブから同時に来ると、先に書いた分を古い一覧で消すため）
+    await saveCacheSerially(async () => {
+      const { azrAmazon: all = {} } = await chrome.storage.local.get('azrAmazon');
+      for (const [k, v] of Object.entries(all)) if (now - v.at >= AMAZON_TTL_MS || !k.startsWith('v5:')) delete all[k];
+      all[key] = { at: now, result };
+      const keys = Object.keys(all);
+      if (keys.length > AMAZON_CACHE_MAX) {
+        const oldest = keys.sort((a, b) => all[a].at - all[b].at).slice(0, keys.length - AMAZON_CACHE_MAX);
+        for (const k of oldest) delete all[k];
+      }
+      await chrome.storage.local.set({ azrAmazon: all });
+    });
   }
-  return result;
+  return withAmazonLinks(result);
 }
 
 /* 獲得したクーポンの履歴 -----------------------------------------------------
@@ -598,6 +619,7 @@ function serialized() {
   };
 }
 const saveAcquiredSerially = serialized();
+const saveCacheSerially = serialized(); // azrRatings・azrAmazon
 
 function recordAcquired(res, record) {
   if (res?.status !== 'acquired' || !record || typeof record !== 'object') return;
@@ -666,13 +688,42 @@ function grabByTab(url) {
  * 未ログインもタブに落とす。ログインすれば獲得ページがそのまま獲得まで進むので、
  * ここでただ「ログインしてください」と言うより手数が少ない。
  */
+/*
+ * 獲得できた（獲得済みだった）クーポンの getkey。自動獲得は商品ページを開くたびに走るので、
+ * 覚えておいて獲得APIを呼び直さない。期限は長めにとる（獲得済みは取り消されない。期限切れのものは呼んでも獲得できない）。
+ */
+const GOT_COUPON_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const GOT_COUPON_MAX = 2000;
+const saveGotSerially = serialized();
+
+async function knownAcquired(key) {
+  const { azrGotCoupons: got = {} } = await chrome.storage.local.get('azrGotCoupons');
+  return Boolean(got[key] && Date.now() - got[key] < GOT_COUPON_TTL_MS);
+}
+
+function rememberAcquired(key) {
+  return saveGotSerially(async () => {
+    const { azrGotCoupons: got = {} } = await chrome.storage.local.get('azrGotCoupons');
+    const now = Date.now();
+    for (const [k, at] of Object.entries(got)) if (now - at >= GOT_COUPON_TTL_MS) delete got[k];
+    got[key] = now;
+    const keys = Object.keys(got);
+    if (keys.length > GOT_COUPON_MAX) {
+      for (const k of keys.sort((a, b) => got[a] - got[b]).slice(0, keys.length - GOT_COUPON_MAX)) delete got[k];
+    }
+    await chrome.storage.local.set({ azrGotCoupons: got });
+  });
+}
+
 async function grabCoupon(url, { apiOnly = false } = {}) {
   const key = couponGetKey(url);
   // getkey の無いページは獲得ページではない。タブで開くと、クーポンのページを「離れた」ことを
   // 獲得できた印と読むため、何も獲得していないのに成功と返してしまう。
   if (!key) return { ok: false, status: 'error' };
+  if (apiOnly && (await knownAcquired(key))) return { ok: true, status: 'already' };
   try {
     const viaApi = await acquireByApi(key);
+    if (viaApi?.ok) rememberAcquired(key);
     if (viaApi && viaApi.status !== 'login') return viaApi;
     // 自動獲得は押されていないので、裏タブを勝手に開かない。未ログイン等は行に返すだけにする。
     if (apiOnly) return viaApi || { ok: false, status: 'unknown' };
@@ -946,17 +997,23 @@ async function loadCampaigns() {
   return stored.azrCampaigns || { updatedAt: 0, items: {} };
 }
 
-// 3タブが同時に結果を返すので、読んで書くまでを1件ずつにする。
+// 同時に結果が返るので、読んで書くまでを1件ずつにする。
 // 並べて走らせると、先に書いた分を後の書き込みが古い一覧で上書きして消す。
 const saveCampaignSerially = serialized();
-function saveCampaign(url, patch) {
+// 長く見ていないページは一覧から落とす（トップから消えたキャンペーンの記録が溜まり続けないように）
+const CAMPAIGN_KEEP_MS = 30 * 24 * 60 * 60 * 1000;
+/** patches は url → 記録。1件ごとに一覧全体を書き直すと重いので、まとめて書く */
+function saveCampaigns(patches) {
   return saveCampaignSerially(async () => {
     const data = await loadCampaigns();
-    data.items[url] = { url, ...(data.items[url] || {}), ...patch };
-    data.updatedAt = Date.now();
+    const now = Date.now();
+    for (const [url, patch] of patches) data.items[url] = { url, ...(data.items[url] || {}), ...patch };
+    for (const [url, it] of Object.entries(data.items)) if (now - (it.checkedAt || 0) >= CAMPAIGN_KEEP_MS) delete data.items[url];
+    data.updatedAt = now;
     await chrome.storage.local.set({ azrCampaigns: data });
   });
 }
+const CAMPAIGN_SAVE_EVERY = 10;
 
 /** まとめて実行。並びは保ちつつ、数タブずつ同時に開く。 */
 async function eachLimited(list, limit, worker) {
@@ -1011,6 +1068,13 @@ async function checkCampaigns(targets, entry) {
   const { campaignTabFallback } = await chrome.storage.sync.get({ campaignTabFallback: false });
 
   const results = [];
+  // 途中で service worker が止まっても判定した分が残るよう、数件ごとに書く
+  let pending = new Map();
+  const flush = () => {
+    const batch = pending;
+    pending = new Map();
+    return batch.size ? saveCampaigns(batch) : null;
+  };
   await eachLimited(targets, campaignTabFallback ? SCAN_CONCURRENCY : SCAN_FETCH_CONCURRENCY, async ({ url, open }) => {
     let r = await checkCampaignByFetch(open, entry);
     if (!r) r = campaignTabFallback ? await runInTab(open, 'campaign', entry) : { status: 'suspect' };
@@ -1021,11 +1085,13 @@ async function checkCampaigns(targets, entry) {
       entered: Boolean(r?.entered),
       checkedAt: Date.now()
     };
-    await saveCampaign(url, item);
+    pending.set(url, item);
+    if (pending.size >= CAMPAIGN_SAVE_EVERY) await flush();
     results.push(item);
     scanState.done = results.length;
     setBadge(String(targets.length - results.length || ''));
   });
+  await flush();
 
   const count = (s) => results.filter((r) => r.status === s).length;
   return {
@@ -1062,11 +1128,12 @@ function enterCampaignUrls(rawUrls) {
   return runScan('エントリー中', async () => ({ ...(await checkCampaigns(targets, true)), skipped }));
 }
 
-function scanCampaigns({ entry, extraLinks = [] }) {
+/** onlyLinks を渡すと、トップページを読まずにそのリンクだけを確かめる */
+function scanCampaigns({ entry, extraLinks = [], onlyLinks = null }) {
   return runScan('トップページを読み込み中', async () => {
     // トップページもタブを開かずに読む。下へ送らないと見えない枠も、リンクはHTMLの中にある。
-    const topHtml = await fetchPage(TOP_PAGE);
-    let rawLinks = topHtml == null ? [] : extractCampaignLinks(topHtml);
+    const topHtml = onlyLinks ? '' : await fetchPage(TOP_PAGE);
+    let rawLinks = onlyLinks || (topHtml == null ? [] : extractCampaignLinks(topHtml));
     // 開いているトップページのDOMにだけあるリンク（フラッシュバナー等）も足す
     rawLinks = rawLinks.concat(extraLinks);
     if (!rawLinks.length) {
@@ -1114,19 +1181,48 @@ async function autoScanOnVisit(extraLinks = []) {
   if (!cfg.enabled || cfg.campaignScanOnTop === false) return { ok: false, skipped: 'off' };
 
   const { azrAutoScanAt = 0 } = await chrome.storage.local.get('azrAutoScanAt');
-  // 開いたトップページに、今日まだ確かめていないキャンペーンのリンクがあれば、間隔に関わらず走らせる
-  // （HTMLだけを読む前回のスキャンでは、DOMにだけあるバナーを拾えていなかった）
+  const entry = cfg.campaignScanEntry !== false;
+  if (Date.now() - azrAutoScanAt >= AUTO_SCAN_INTERVAL_MS) {
+    // 走らせる前に印を立てる。楽天のページを複数のタブで開くと、ほぼ同時に頼まれる。
+    await chrome.storage.local.set({ azrAutoScanAt: Date.now() });
+    return scanCampaigns({ entry, extraLinks });
+  }
+  // 間隔の内でも、開いたトップページに今日まだ確かめていないキャンペーンのリンクがあれば、それだけを確かめる
+  // （HTMLだけを読むスキャンでは、DOMにだけあるバナーを拾えない。全件を取り直す必要は無い）
+  if (!extraLinks.length) return { ok: false, skipped: 'recent' };
   const stored = await loadCampaigns();
   const today = jstDay(Date.now());
-  const fresh = extraLinks.map(normalizeCampaignUrl).some((u) => u && jstDay(stored.items[u]?.checkedAt || 0) !== today);
-  if (!fresh && Date.now() - azrAutoScanAt < AUTO_SCAN_INTERVAL_MS) return { ok: false, skipped: 'recent' };
-
-  // 走らせる前に印を立てる。楽天のページを複数のタブで開くと、ほぼ同時に頼まれる。
-  await chrome.storage.local.set({ azrAutoScanAt: Date.now() });
-  return scanCampaigns({ entry: cfg.campaignScanEntry !== false, extraLinks });
+  const fresh = extraLinks.filter((l) => {
+    const u = normalizeCampaignUrl(l);
+    return u && jstDay(stored.items[u]?.checkedAt || 0) !== today;
+  });
+  if (!fresh.length) return { ok: false, skipped: 'recent' };
+  return scanCampaigns({ entry, onlyLinks: fresh });
 }
 
+/** 拡張のページ（ポップアップ。タブで開いたものも含む）からの呼び出しか。content script からは受け付けない操作に使う */
+const fromExtensionPage = (sender) => String(sender?.url || '').startsWith(chrome.runtime.getURL(''));
+const POPUP_ONLY = new Set(['azr:scanCampaigns', 'azr:enterCampaignUrls']);
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (POPUP_ONLY.has(msg?.type) && !fromExtensionPage(sender)) {
+    sendResponse({ ok: false, error: '対象外の呼び出しです' });
+    return false;
+  }
+
+  // キャンペーンページから: このURLで自動エントリーするのは初めてか（ブラウザを閉じるまで覚える）
+  if (msg?.type === 'azr:entryOnce') {
+    const key = 'azrEntered:' + String(msg.url || '').slice(0, 300);
+    chrome.storage.session.get(key)
+      .then(async (got) => {
+        if (got[key]) return { first: false };
+        await chrome.storage.session.set({ [key]: Date.now() });
+        return { first: true };
+      })
+      .then(sendResponse, () => sendResponse(null));
+    return true; // 非同期応答
+  }
+
   // 裏タブから: 自分は何をすべきタブか
   if (msg?.type === 'azr:scanTask') {
     sendResponse(sender.tab?.id != null ? (scanTasks.get(sender.tab.id) || null) : null);
@@ -1480,9 +1576,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // （商品ページより応答が速いのでトップを見る）。結果は24時間キャッシュ
 const RL_SHOP_TTL = 24 * 60 * 60 * 1000;
 
+const saveShopsSerially = serialized();
+
 async function rlIsShopOpen(shop) {
-    const key = 'shop:' + shop;
-    const cached = (await chrome.storage.local.get(key))[key];
+    const { azrShops: shops = {} } = await chrome.storage.local.get('azrShops');
+    const cached = shops[shop];
     if (cached && Date.now() - cached.at < RL_SHOP_TTL) return cached.open;
     let open;
     try {
@@ -1493,7 +1591,14 @@ async function rlIsShopOpen(shop) {
     } catch {
         return null;
     }
-    await chrome.storage.local.set({ [key]: { open, at: Date.now() } });
+    // 1つのキーにまとめ、期限切れはここで捨てる（以前は店舗ごとのキーで、消されずに溜まり続けた）
+    await saveShopsSerially(async () => {
+        const { azrShops: all = {} } = await chrome.storage.local.get('azrShops');
+        const now = Date.now();
+        for (const [k, v] of Object.entries(all)) if (now - v.at >= RL_SHOP_TTL) delete all[k];
+        all[shop] = { open, at: now };
+        await chrome.storage.local.set({ azrShops: all });
+    });
     return open;
 }
 

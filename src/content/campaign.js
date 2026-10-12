@@ -287,14 +287,13 @@
 
     // エントリーボタンを押すとページが再読み込みされることがある。
     // 何度も押し続けないよう、このURLで一度実行したことを記録しておく。
-    const doneKey = 'azrEntered:' + location.href.split('?')[0];
-    let alreadyRun = false;
+    // 記録は service worker が session storage に持つ（content script には session storage を開かない）。
+    // 確かめられないときは押さない（押し続けるよりよい）。
+    let once = null;
     try {
-      alreadyRun = Boolean((await chrome.storage.session.get(doneKey))[doneKey]);
-    } catch { /* session storage 不可 */ }
-
-    if (alreadyRun) return;
-    try { await chrome.storage.session.set({ [doneKey]: Date.now() }); } catch { /* noop */ }
+      once = await chrome.runtime.sendMessage({ type: 'azr:entryOnce', url: location.href.split('?')[0] });
+    } catch { /* service worker が落ちている */ }
+    if (!once?.first) return;
     const r = await enterPage(true);
     AZR.log('自動エントリー', r);
     const statusEl = document.querySelector('#azr-campaign-panel .azr-coupon-status');

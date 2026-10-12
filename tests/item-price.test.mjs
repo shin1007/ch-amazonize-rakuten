@@ -8,7 +8,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadAZR } from './load.mjs';
+import { loadAZR, loadServiceWorker } from './load.mjs';
 
 const AZR = loadAZR([
   'src/lib/settings.js', 'src/lib/i18n.js', 'src/lib/dom.js', 'src/lib/coupon-model.js', 'src/content/item-coupons.js'
@@ -83,4 +83,17 @@ test('価格に効かせるのは、この商品ページで獲得できるク�
   // 店舗のお知らせ。対象商品も条件も分からない。
   assert.equal(affectsPrice({ href: 'https://www.rakuten.co.jp/shop/' }), false);
   assert.equal(affectsPrice({ href: null }), false);
+});
+
+test('獲得済みと分かっているクーポンは、自動獲得で獲得APIを呼び直さない', async () => {
+  const calls = [];
+  const storage = {};
+  const fetch = async (url) => { calls.push(String(url)); return { ok: true, status: 200, json: async () => ({ is_already_acquired: false }) }; };
+  const sw = loadServiceWorker({ fetch, storage });
+  const url = 'https://coupon.rakuten.co.jp/getCoupon?getkey=ABC-123&rt=';
+  assert.equal((await sw.grabCoupon(url, { apiOnly: true })).status, 'acquired');
+  await new Promise((r) => setTimeout(r, 0));
+  assert.ok(storage.azrGotCoupons['ABC-123']);
+  assert.equal((await sw.grabCoupon(url, { apiOnly: true })).status, 'already');
+  assert.equal(calls.length, 1);
 });

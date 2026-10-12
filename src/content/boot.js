@@ -55,7 +55,8 @@
     // 楽天のページを開いたのを合図に、裏でキャンペーンを探してエントリーする。
     // タブは開かないので、開いているページも画面も変わらない（以前はトップページ限定だった）。
     // 走らせるかどうか（設定・前回からの間隔・実行中か）は service worker が決める。
-    if (AZR.settings.campaignScanOnTop) {
+    // かご・購入手続き（*.step.rakuten.co.jp）では走らせない。決済の通信と取り合わせない。
+    if (AZR.settings.campaignScanOnTop && !/(^|\.)step\./.test(location.host)) {
       const links = kind === 'top' ? await AZR.collectCampaignLinks?.({ scroll: false }).catch(() => []) : [];
       chrome.runtime.sendMessage({ type: 'azr:autoScanCampaigns', links })
         .then((r) => AZR.log('自動スキャン', r))
