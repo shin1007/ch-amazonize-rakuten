@@ -266,14 +266,16 @@
                     continue;
                 }
                 const tag = ` (${r.it && r.hit || r.label})`;
-                const it = r.it;
+                // 中継サーバーの応答をそのままリンクにしない（https 以外は捨てる）
+                const https = (u) => (/^https:\/\//i.test(String(u || '')) ? String(u) : '');
+                const it = r.it && https(r.it.affiliateUrl || r.it.itemUrl) ? r.it : null;
                 const box = document.createElement(it ? 'a' : 'div');
                 Object.assign(box.style, { display: 'flex', gap: '8px', alignItems: 'center', flex: '1', minWidth: 'min-content', color: '#333', textDecoration: 'none', fontSize: '12px' });
-                if (it) { box.href = it.affiliateUrl || it.itemUrl; box.target = '_blank'; box.rel = 'noopener noreferrer'; }
+                if (it) { box.href = https(it.affiliateUrl || it.itemUrl); box.target = '_blank'; box.rel = 'noopener noreferrer'; }
                 const img = document.createElement('div');
                 Object.assign(img.style, { width: '52px', height: '52px', flex: 'none', background: '#f5f5f5' });
                 const im = document.createElement('img');
-                im.src = it?.imageUrl || NO_IMAGE;
+                im.src = https(it?.imageUrl) || NO_IMAGE;
                 im.onerror = () => { im.onerror = null; im.src = NO_IMAGE; };
                 Object.assign(im.style, { width: '100%', height: '100%', objectFit: 'contain' });
                 img.replaceChildren(im);

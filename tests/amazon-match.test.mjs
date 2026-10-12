@@ -242,7 +242,7 @@ test('同じ商品を開き直しても読みに行かない（結果は覚え�
   assert.equal(calls.length, 1);
   assert.equal(second.cached, true);
   assert.equal(second.item.asin, first.item.asin);
-  assert.ok(storage.azrAmazon['v4:jan:4580688635054:']);
+  assert.ok(storage.azrAmazon['v5:jan:4580688635054:']);
 });
 
 const EMPTY_HTML = '<!doctype html><html><body><div class="s-main-slot"></div></body></html>';
