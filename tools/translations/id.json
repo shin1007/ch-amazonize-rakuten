@@ -219,5 +219,18 @@
   "（送料込みの比較。楽天のポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin Rakuten tidak termasuk)",
   "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin Rakuten tidak termasuk)",
   "（送料込みの比較。ポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin tidak termasuk)",
-  "（表示価格の比較。送料・ポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin tidak termasuk)"
+  "（表示価格の比較。送料・ポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin tidak termasuk)",
+  "自動で行う操作の確認": "Konfirmasi tindakan otomatis",
+  "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "Tindakan berikut dijalankan di akun Rakuten yang sedang masuk tanpa Anda menekan tombol. Pilih yang ingin digunakan lalu tekan \"Mulai dengan pengaturan ini\". Tidak ada yang dijalankan sebelum Anda menekannya.",
+  "クーポンを自動で獲得する": "Ambil kupon secara otomatis",
+  "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "Saat membuka halaman produk, ambil kupon di halaman itu (termasuk kupon dengan jumlah terbatas).",
+  "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Beralih otomatis ke kupon paling hemat di halaman konfirmasi pesanan",
+  "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "Jika diskon berkurang setelah beralih, kembali ke kupon sebelumnya. Tidak pernah menekan tombol untuk menyelesaikan pesanan.",
+  "キャンペーンを探して自動でエントリーする": "Cari kampanye dan ikuti secara otomatis",
+  "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "Saat membuka halaman Rakuten, periksa kampanye di halaman utama setiap 12 jam dan ikuti yang belum Anda ikuti.",
+  "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Anda dapat mengubahnya kapan saja dari ikon di bilah alat (popup).",
+  "この内容で始める": "Mulai dengan pengaturan ini",
+  "設定しました。このタブは閉じてかまいません。": "Pengaturan disimpan. Anda boleh menutup tab ini.",
+  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Tindakan otomatis (seperti mengambil kupon otomatis) belum diaktifkan.",
+  "確認して有効にする": "Tinjau dan aktifkan"
 }

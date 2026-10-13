@@ -219,5 +219,18 @@
   "（送料込みの比較。楽天のポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng Rakuten)",
   "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng Rakuten)",
   "（送料込みの比較。ポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng)",
-  "（表示価格の比較。送料・ポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng)"
+  "（表示価格の比較。送料・ポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng)",
+  "自動で行う操作の確認": "Xác nhận các thao tác tự động",
+  "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "Các thao tác sau sẽ được thực hiện trên tài khoản Rakuten đang đăng nhập mà bạn không cần nhấn nút. Hãy chọn những mục muốn dùng rồi nhấn \"Bắt đầu với cài đặt này\". Trước khi bạn nhấn, không thao tác nào được thực hiện.",
+  "クーポンを自動で獲得する": "Tự động nhận phiếu giảm giá",
+  "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "Khi mở trang sản phẩm, nhận các phiếu giảm giá trên trang đó (kể cả phiếu có số lượng giới hạn).",
+  "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Tự động chuyển sang phiếu giảm giá có lợi nhất ở màn hình xác nhận đơn hàng",
+  "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "Nếu mức giảm giá ít đi sau khi chuyển, sẽ chuyển lại phiếu trước đó. Không bao giờ nhấn nút xác nhận đặt hàng.",
+  "キャンペーンを探して自動でエントリーする": "Tìm chiến dịch và tự động đăng ký",
+  "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "Khi mở trang Rakuten, cứ 12 giờ kiểm tra các chiến dịch trên trang chủ một lần và đăng ký những chiến dịch bạn chưa đăng ký.",
+  "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Bạn có thể thay đổi bất cứ lúc nào từ biểu tượng trên thanh công cụ (cửa sổ bật lên).",
+  "この内容で始める": "Bắt đầu với cài đặt này",
+  "設定しました。このタブは閉じてかまいません。": "Đã lưu cài đặt. Bạn có thể đóng thẻ này.",
+  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Các thao tác tự động (như tự động nhận phiếu giảm giá) chưa được bật.",
+  "確認して有効にする": "Xem lại và bật"
 }

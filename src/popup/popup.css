@@ -106,3 +106,4 @@ button:not(.primary) {
 .campaign .empty, .campaign-list .empty { color: #565959; }
 footer label.lang { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 footer select { flex: 1; }
+.consent { margin: 8px 0 0; padding: 6px 8px; background: #fff8e5; border: 1px solid #f0c36d; border-radius: 6px; font-size: 12px; }

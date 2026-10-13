@@ -1,0 +1,19 @@
+:root { color-scheme: light; }
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #0f1111;
+  background: #f7f8f8;
+}
+main { max-width: 560px; margin: 40px auto; padding: 24px 28px; background: #fff; border: 1px solid #eaeded; border-radius: 8px; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+h2 { font-size: 15px; margin: 0 0 12px; color: #565959; }
+label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid #eaeded; cursor: pointer; }
+label input { margin-top: 5px; }
+label span { font-size: 13px; color: #565959; }
+label b { color: #0f1111; font-size: 14px; }
+.note { color: #565959; font-size: 12px; }
+button.primary { padding: 8px 20px; font-size: 14px; border: 1px solid #fcd200; border-radius: 8px; background: #ffd814; cursor: pointer; }
+.status { min-height: 1.6em; color: #067d62; }

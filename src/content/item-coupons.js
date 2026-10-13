@@ -156,7 +156,7 @@
   let autoGrabStopped = false;
 
   async function autoGrab(rows) {
-    if (!AZR.settings.couponAutoGrab) return;
+    if (!AZR.settings.couponAutoGrab || !AZR.settings.consentAt) return;
     for (const { key, link, status, run } of rows) {
       const already = autoGrabbed.get(key);
       if (already) {

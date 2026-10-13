@@ -219,5 +219,18 @@
   "（送料込みの比較。楽天のポイント還元は含みません）": "(Compared incl. shipping. Rakuten points not included)",
   "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Listed prices compared. Shipping and Rakuten points not included)",
   "（送料込みの比較。ポイント還元は含みません）": "(Compared incl. shipping. Points not included)",
-  "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)"
+  "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)",
+  "自動で行う操作の確認": "Confirm automatic actions",
+  "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "The following actions run on your logged-in Rakuten account without you pressing any button. Choose the ones to use and press \"Start with these settings\". Nothing runs until you press it.",
+  "クーポンを自動で獲得する": "Get coupons automatically",
+  "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "When you open an item page, get the coupons on that page (including coupons with limited quantities).",
+  "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Switch to the best coupon automatically on the order confirmation page",
+  "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "If the discount goes down after switching, switch back to the previous coupon. Never presses the button to place the order.",
+  "キャンペーンを探して自動でエントリーする": "Find campaigns and enter them automatically",
+  "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "When you open a Rakuten page, check the campaigns on the top page every 12 hours and enter the ones you haven't entered.",
+  "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "You can change these anytime from the toolbar icon (popup).",
+  "この内容で始める": "Start with these settings",
+  "設定しました。このタブは閉じてかまいません。": "Saved. You can close this tab.",
+  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Automatic actions (such as getting coupons automatically) are not enabled yet.",
+  "確認して有効にする": "Review and enable"
 }

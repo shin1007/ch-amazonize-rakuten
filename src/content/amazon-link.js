@@ -123,20 +123,14 @@
             } catch { resolve({ error: 'runtime' }); }
         });
 
-        // 商品名の類似度（文字bigramのDice係数）
-        const bigrams = (s) => {
-            const t = s.toLowerCase().replace(/[【\[（(][^】\])）]*[】\])）]/g, '').replace(/[\s\-_/・|｜,、]+/g, '');
-            const set = new Set();
-            for (let i = 0; i < t.length - 1; i++) set.add(t.slice(i, i + 2));
-            return set;
-        };
-        const amazonBigrams = bigrams(title);
-        const similarity = (name) => {
-            const b = bigrams(name);
-            let hit = 0;
-            b.forEach(g => { if (amazonBigrams.has(g)) hit++; });
-            return b.size + amazonBigrams.size ? (2 * hit) / (b.size + amazonBigrams.size) : 0;
-        };
+        /*
+         * 商品名の類似度。楽天・Yahoo!の商品ページと同じ scoreMatch（amazon-match.js）を使う。
+         * 以前はここだけ文字の2文字ずつの重なり（Dice係数）と価格差で選んでいて、ページによって判定が違った。
+         * JANで正解を決めた比較（tools/match-eval.mjs）では、scoreMatch に下の規格の食い違いを組み合わせた形（このページの形）が、
+         * Dice係数（価格差あり・なし）より損失が小さかった。
+         * Amazonの商品名（短い）の語が、楽天・Yahoo!の商品名（宣伝で長い）にどれだけ入っているかで見る。
+         */
+        const similarity = (name) => AZR.amazon.scoreMatch(title, name);
         // 数量・規格（4入力 / 2台 / 256GB / 3個セット 等）が食い違う商品は別物とみなす
         const toHalf = (s) => s.replace(/[０-９．]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
         const specsOf = (s) => {
@@ -149,6 +143,8 @@
             return m;
         };
         const amazonSpecs = specsOf(title);
+        // 名前で引いたときの合格点（service worker の AMAZON_MIN_SCORE と同じ）
+        const MIN_SCORE = 0.3;
         const specMismatch = (name) => {
             for (const [u, nums] of specsOf(name)) {
                 const a = amazonSpecs.get(u);
@@ -157,11 +153,11 @@
             return false;
         };
 
-        const rankItems = (items) => items
-            .map(it => {
-                const priceGap = amazonPrice ? Math.min(Math.abs(it.itemPrice - amazonPrice) / amazonPrice, 1) : 0;
+        // 新品の商品ページに中古・整備済み品を当てない（楽天・Yahoo!の商品ページと同じ）
+        const rankItems = (items) => AZR.amazon.sameCondition(title, items.map((it) => ({ ...it, title: it.itemName })))
+            .map(({ title: _, ...it }) => {
                 const sim = similarity(it.itemName);
-                return { it, sim, mismatch: specMismatch(it.itemName), score: sim - 0.3 * priceGap };
+                return { it, sim, mismatch: specMismatch(it.itemName), score: sim };
             })
             .sort((a, b) => b.score - a.score);
 
@@ -179,7 +175,7 @@
                 const matched = all.filter(r => !r.mismatch);
                 // 商品名検索: 規格違い・類似度が低いものを除外
                 // コード検索: 一致が保証されるので、規格違い（まとめ売り等）は他が無いときだけ残す
-                ranked = (c.type ? (matched.length ? matched : all) : matched.filter(r => r.sim >= 0.25)).map(r => r.it);
+                ranked = (c.type ? (matched.length ? matched : all) : matched.filter(r => r.sim >= MIN_SCORE)).map(r => r.it);
                 code = c; keyword = c.value;
                 return;
             }
@@ -191,7 +187,7 @@
             if (!code?.type) { titleTop = ranked[0] || null; return; }
             const res = await apiSearch({ type: null, value: titleKw });
             if (res?.searchUrl) affiliateSearchUrls.set(titleKw, res.searchUrl);
-            const top = res?.items?.length && rankItems(res.items).filter(r => !r.mismatch && r.sim >= 0.25)[0];
+            const top = res?.items?.length && rankItems(res.items).filter(r => !r.mismatch && r.sim >= MIN_SCORE)[0];
             titleTop = top ? top.it : null;
         };
 
