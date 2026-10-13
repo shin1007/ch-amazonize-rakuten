@@ -65,7 +65,9 @@
     }, true);
 
     /* 2. Amazon・楽天の価格 -------------------------------------------------- */
-    if (!AZR.settings.yahooItem) return;
+    const { SITES, HOMES, mount } = AZR.priceCompare;
+    const sites = [AZR.settings.yahooItem && SITES.amazon, AZR.settings.yahooPageRakuten && SITES.rakuten].filter(Boolean);
+    if (!sites.length) return;
 
     let item = null;
     try {
@@ -116,11 +118,10 @@
         return best;
     }
 
-    const { SITES, HOMES, mount } = AZR.priceCompare;
     const anchor = document.getElementById('prcdsp'); // 中央の列の価格の欄
     AZR.health.check('yahoo.pricePlace', anchor, '#prcdsp（価格の欄）が無い');
     if (!anchor) return;
-    const { boxes, repaint } = mount(anchor, data, [SITES.amazon, SITES.rakuten], HOMES.yahoo);
+    const { boxes, repaint } = mount(anchor, data, sites, HOMES.yahoo);
 
     // 価格の欄に出ている数字（選択肢を選ぶと変わる）
     const shownPrice = () => Number((document.querySelector('#prcdsp [class*="_price__"]')?.textContent.match(/[\d,]+/)?.[0] || '').replace(/,/g, '')) || 0;

@@ -6,10 +6,13 @@
     simplifyItem: true,       // 商品ページをAmazon風に再構成
     simplifySearch: true,     // 検索結果を整理
     cartTotal: true,          // カゴの合計金額パネル
-    amazonPrice: true,        // 商品ページにAmazonでの価格を出す
+    // ほかのサイトの価格。開いている商品ページのサイトごとに、出すサイトを選ぶ
+    amazonPrice: true,        // 楽天の商品ページに、Amazonでの価格を出す
+    yahooPrice: true,         // 楽天の商品ページに、Yahoo!ショッピングでの価格を出す
     rakutenLink: true,        // Amazonの商品ページに、楽天の同じ商品へのリンクと価格を出す
-    yahooPrice: true,         // 楽天・Amazonの商品ページに、Yahoo!ショッピングでの価格も出す
-    yahooItem: true,          // Yahoo!ショッピングの商品ページに、Amazon・楽天での価格を出す
+    amazonPageYahoo: true,    // Amazonの商品ページに、Yahoo!ショッピングでの価格を出す
+    yahooItem: true,          // Yahoo!ショッピングの商品ページに、Amazonでの価格を出す
+    yahooPageRakuten: true,   // Yahoo!ショッピングの商品ページに、楽天での価格を出す
     nesagePromo: true,        // Amazonのほしい物リストで、値下げ通知サービス nesage.party への登録を案内する
     couponList: true,        // 商品ページにクーポンを並べる（その場で獲得できる）
     couponAutoGrab: true,     // 商品ページを開いた時点で、押さずに獲得する
