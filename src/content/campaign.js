@@ -283,7 +283,7 @@
     document.getElementById('azr-campaign-panel')?.remove();
     document.body.append(render(first));
 
-    if (!AZR.settings.campaignAutoEntry || first.status !== 'entry') return;
+    if (!AZR.settings.campaignAutoEntry || !AZR.settings.consentAt || first.status !== 'entry') return;
 
     // エントリーボタンを押すとページが再読み込みされることがある。
     // 何度も押し続けないよう、このURLで一度実行したことを記録しておく。

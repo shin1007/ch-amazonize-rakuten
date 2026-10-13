@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>Amazonize Rakuten</title>
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <main>
+    <h1>Amazonize Rakuten</h1>
+    <h2>自動で行う操作の確認</h2>
+    <p>次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。</p>
+
+    <label><input type="checkbox" id="couponAutoGrab"> <span><b>クーポンを自動で獲得する</b><br>商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。</span></label>
+    <label><input type="checkbox" id="couponAutoSwitch"> <span><b>注文確認画面で、いちばん得なクーポンに自動で切り替える</b><br>切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。</span></label>
+    <label><input type="checkbox" id="campaignAutoScan"> <span><b>キャンペーンを探して自動でエントリーする</b><br>楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。</span></label>
+
+    <p class="note">あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。</p>
+    <button id="start" class="primary">この内容で始める</button>
+    <p class="status" id="status"></p>
+  </main>
+
+  <script src="../lib/settings.js"></script>
+  <script src="../lib/i18n-data.js"></script>
+  <script src="../lib/i18n.js"></script>
+  <script src="welcome.js"></script>
+</body>
+</html>

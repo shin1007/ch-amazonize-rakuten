@@ -2,6 +2,14 @@
 import privacyHtml from './privacy.html';
 const API = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701';
 const CACHE_TTL = 3600;
+/*
+ * 失敗も短い間だけ覚える。同じ検索語で失敗が続くと、そのたびに外部APIを呼び、回数制限を食い合う。
+ * 検索語が悪い（4xx）ものは何度呼んでも同じなので長めに、混雑・障害（429・5xx）はすぐ引き直せるよう短く。
+ * KV の期限は60秒より短くできない。
+ */
+const ERROR_TTL_BAD = 600;
+const ERROR_TTL_BUSY = 60;
+const errorTtl = (result) => (/^upstream 4(?!29)/.test(result.error || '') ? ERROR_TTL_BAD : ERROR_TTL_BUSY);
 
 const json = (body, status = 200, extra = {}) => new Response(JSON.stringify(body), {
     status,
@@ -83,7 +91,7 @@ async function callYahoo({ keyword, jan }, env) {
 const yahooSearchPage = (q) => `https://shopping.yahoo.co.jp/search?p=${encodeURIComponent(q)}`;
 
 /**
- * 回数制限（同じIPから1分60回）。キャッシュに当たった応答は外部APIを呼ばないので数えない
+ * 回数制限（同じIPから1分60回）。キャッシュ（KVも含む）に当たった応答は外部APIを呼ばないので数えない
  * （商品ページを続けて開くと、同じ検索語の問い合わせが重なって制限に当たっていた）。
  */
 async function limited(request, env) {
@@ -92,25 +100,57 @@ async function limited(request, env) {
     return success ? null : json({ error: 'rate_limited' }, 429);
 }
 
+/**
+ * キャッシュを通して答える。順に
+ *   1. このデータセンターのキャッシュ（caches.default。速いが、データセンターごとに別）
+ *   2. KV（RELAY_CACHE。全データセンターで共通。ほかの地域の利用者が引いた結果も使える）
+ *   3. 外部API（ここに来たときだけ回数制限を数える）
+ * 失敗は KV にだけ短い期限で置く（応答は 502 のまま返す）。KV が無い・書けない（無料枠の書き込み上限など）ときは飛ばす。
+ */
+async function cachedAnswer({ origin, path, env, ctx, request, produce }) {
+    const cacheKey = new Request(`${origin}${path}`);
+    const cached = await caches.default.match(cacheKey);
+    if (cached) return cached;
+
+    const kv = env.RELAY_CACHE;
+    const stored = kv ? await kv.get(path, 'json').catch(() => null) : null;
+    if (stored?.result) {
+        if (stored.status !== 200) return json(stored.result, stored.status);
+        const res = json(stored.result, 200, { 'cache-control': `public, max-age=${CACHE_TTL}` });
+        ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
+        return res;
+    }
+
+    const over = await limited(request, env);
+    if (over) return over;
+
+    const result = await produce();
+    const status = result.error ? 502 : 200;
+    if (kv) {
+        const ttl = result.error ? errorTtl(result) : CACHE_TTL;
+        ctx.waitUntil(kv.put(path, JSON.stringify({ status, result }), { expirationTtl: ttl }).catch(() => {}));
+    }
+    if (result.error) return json(result, status);
+    const res = json(result, 200, { 'cache-control': `public, max-age=${CACHE_TTL}` });
+    ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
+    return res;
+}
+
 async function handleYahoo(url, env, ctx, request) {
     if (!env.YAHOO_APP_ID) return json({ error: 'not_configured' }, 503);
     const jan = (url.searchParams.get('jan') || '').replace(/\D/g, '');
     const keyword = (url.searchParams.get('keyword') || '').replace(/\s+/g, ' ').trim();
     if (jan ? !/^(\d{8}|\d{13})$/.test(jan) : (keyword.length < 2 || keyword.length > 128)) return json({ error: 'bad_keyword' }, 400);
 
-    const cacheKey = new Request(`${url.origin}/yahoo?v=2&${jan ? `jan=${jan}` : `keyword=${encodeURIComponent(keyword)}`}`);
-    const cached = await caches.default.match(cacheKey);
-    if (cached) return cached;
-    const over = await limited(request, env);
-    if (over) return over;
-
-    const result = await callYahoo({ keyword, jan }, env);
-    const page = yahooSearchPage(jan || keyword);
-    result.searchUrl = vcLink(page, env) || page;
-    if (result.error) return json(result, 502);
-    const res = json(result, 200, { 'cache-control': `public, max-age=${CACHE_TTL}` });
-    ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
-    return res;
+    return cachedAnswer({
+        origin: url.origin, path: `/yahoo?v=2&${jan ? `jan=${jan}` : `keyword=${encodeURIComponent(keyword)}`}`, env, ctx, request,
+        produce: async () => {
+            const result = await callYahoo({ keyword, jan }, env);
+            const page = yahooSearchPage(jan || keyword);
+            result.searchUrl = vcLink(page, env) || page;
+            return result;
+        }
+    });
 }
 
 export default {
@@ -127,17 +167,13 @@ export default {
         if (keyword.length < 2 || keyword.length > 128) return json({ error: 'bad_keyword' }, 400);
 
         // 正規化したキーワードでキャッシュ
-        const cacheKey = new Request(`${url.origin}/search?v=8&keyword=${encodeURIComponent(keyword)}`);
-        const cached = await caches.default.match(cacheKey);
-        if (cached) return cached;
-        const over = await limited(request, env);
-        if (over) return over;
-
-        const result = await callRakuten(keyword, env);
-        result.searchUrl = searchPageUrl(keyword, env);
-        if (result.error) return json(result, 502);
-        const res = json(result, 200, { 'cache-control': `public, max-age=${CACHE_TTL}` });
-        ctx.waitUntil(caches.default.put(cacheKey, res.clone()));
-        return res;
+        return cachedAnswer({
+            origin: url.origin, path: `/search?v=8&keyword=${encodeURIComponent(keyword)}`, env, ctx, request,
+            produce: async () => {
+                const result = await callRakuten(keyword, env);
+                result.searchUrl = searchPageUrl(keyword, env);
+                return result;
+            }
+        });
     }
 };

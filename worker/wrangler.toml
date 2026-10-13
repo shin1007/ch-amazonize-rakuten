@@ -20,6 +20,11 @@ type = "Text"
 globs = ["**/*.html"]
 fallthrough = true
 
+# 中継の結果のキャッシュ（全データセンター共通）。成功は1時間、失敗は1〜10分
+[[kv_namespaces]]
+binding = "RELAY_CACHE"
+id = "ba97a8a0fa0b41c6bd4432fcd25177ca"
+
 # 接続元IPごとのレート制限（公開後の濫用対策）
 [[ratelimits]]
 name = "LIMITER"

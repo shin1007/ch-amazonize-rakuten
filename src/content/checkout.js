@@ -305,6 +305,45 @@
       }
     };
 
+    /*
+     * 自動で切り替えた後、実際に引かれる額が増えたかを確かめる。割引額はクーポンの文言から推測しているので、
+     * 読み違えて損なクーポンに切り替えることがありうる。減っていたら、前に選ばれていたクーポンへ戻す。
+     */
+    const appliedOf = (s) => collect(s).reduce((t, g) => t + g.applied, 0);
+    const waitApplied = (before, timeout = 8000) => new Promise((resolve) => {
+      let done = false;
+      let off = null;
+      const finish = (v) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        off?.();
+        resolve(v);
+      };
+      const timer = setTimeout(() => finish(null), timeout);
+      off = onState((s) => { const a = appliedOf(s); if (a !== before) finish(a); });
+      if (done) off();
+    });
+    const verifyAutoApply = async (before, prev, chosen) => {
+      const after = await waitApplied(before);
+      AZR.log('auto apply verify', { before, after });
+      AZR.health.check('checkout.verify', after != null, '切り替えた後の割引額が届かない');
+      if (after == null || after >= before) return;
+      AZR.health.check('checkout.estimate', false, `推測より割引が少ない: ${chosen.label}（${before}円 → ${after}円）`);
+      if (!prev.length) return;
+      busy = true;
+      try {
+        const r = await applyCoupon(prev[0], [chosen]);
+        AZR.log('auto apply revert', r);
+        AZR.health.check('checkout.revert', r.ok, r.reason);
+      } catch (e) {
+        AZR.warn('クーポンを戻せなかった:', e);
+      } finally {
+        busy = false;
+        lastSignature = '';
+      }
+    };
+
     const paint = async (current) => {
       if (busy) return;
       const groups = collect(current);
@@ -332,10 +371,12 @@
 
       // 確認なしの設定なら、いちばん得なものに1回だけ自分で切り替える
       // （失敗しても押し直しはしない。表示のボタンから本人がやり直せる）
-      if (better && !autoApplied && !AZR.settings.couponAutoApplyConfirm) {
+      if (better && !autoApplied && !AZR.settings.couponAutoApplyConfirm && AZR.settings.consentAt) {
         autoApplied = true;
+        const prev = selected.filter((c) => !sameCoupon(c, better.coupon));
         const r = await runApply(better.coupon);
         AZR.log('auto apply', r);
+        if (r.ok) await verifyAutoApply(appliedTotal, prev, better.coupon);
       }
     };
 

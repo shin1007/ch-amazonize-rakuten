@@ -35,6 +35,9 @@ async function init() {
     location.reload(); // 静的な文言は日本語の原文から置き直すので、開き直す
   });
 
+  // 自動で行う操作は同意するまで動かない。まだなら、選ぶページへの案内を出す
+  $('#consentNotice').hidden = Boolean(s.consentAt);
+
   $('#enabled').checked = s.enabled;
   $('#enabled').addEventListener('change', (e) =>
     chrome.storage.sync.set({ enabled: e.target.checked }));

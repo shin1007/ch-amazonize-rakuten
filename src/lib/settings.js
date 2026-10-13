@@ -25,6 +25,9 @@
       'https://event.rakuten.co.jp/campaign/sports/',
       'https://event.rakuten.co.jp/campaign/point-up/everyday/point/'
     ],
+    // 自動で行う操作（クーポンの自動獲得・自動切り替え・キャンペーンの自動エントリー）に同意した時刻。
+    // 0 の間はどれも動かさない（入れた直後に開く welcome ページで選んでもらう）
+    consentAt: 0,
     noAffiliate: false,       // 開発用: アフィリエイト/アソシエイトIDを含めない
     debug: false
   };

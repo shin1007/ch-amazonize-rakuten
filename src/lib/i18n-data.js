@@ -223,7 +223,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "(Compared incl. shipping. Rakuten points not included)",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Listed prices compared. Shipping and Rakuten points not included)",
       "（送料込みの比較。ポイント還元は含みません）": "(Compared incl. shipping. Points not included)",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(Listed prices compared. Shipping and points not included)",
+      "自動で行う操作の確認": "Confirm automatic actions",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "The following actions run on your logged-in Rakuten account without you pressing any button. Choose the ones to use and press \"Start with these settings\". Nothing runs until you press it.",
+      "クーポンを自動で獲得する": "Get coupons automatically",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "When you open an item page, get the coupons on that page (including coupons with limited quantities).",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Switch to the best coupon automatically on the order confirmation page",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "If the discount goes down after switching, switch back to the previous coupon. Never presses the button to place the order.",
+      "キャンペーンを探して自動でエントリーする": "Find campaigns and enter them automatically",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "When you open a Rakuten page, check the campaigns on the top page every 12 hours and enter the ones you haven't entered.",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "You can change these anytime from the toolbar icon (popup).",
+      "この内容で始める": "Start with these settings",
+      "設定しました。このタブは閉じてかまいません。": "Saved. You can close this tab.",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Automatic actions (such as getting coupons automatically) are not enabled yet.",
+      "確認して有効にする": "Review and enable"
     },
     "id": {
       "楽天 ￥{p}{via}": "Rakuten ¥{p}{via}",
@@ -446,7 +459,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin Rakuten tidak termasuk)",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin Rakuten tidak termasuk)",
       "（送料込みの比較。ポイント還元は含みません）": "(Perbandingan termasuk ongkir. Poin tidak termasuk)",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin tidak termasuk)"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(Perbandingan harga tertera. Ongkir dan poin tidak termasuk)",
+      "自動で行う操作の確認": "Konfirmasi tindakan otomatis",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "Tindakan berikut dijalankan di akun Rakuten yang sedang masuk tanpa Anda menekan tombol. Pilih yang ingin digunakan lalu tekan \"Mulai dengan pengaturan ini\". Tidak ada yang dijalankan sebelum Anda menekannya.",
+      "クーポンを自動で獲得する": "Ambil kupon secara otomatis",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "Saat membuka halaman produk, ambil kupon di halaman itu (termasuk kupon dengan jumlah terbatas).",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Beralih otomatis ke kupon paling hemat di halaman konfirmasi pesanan",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "Jika diskon berkurang setelah beralih, kembali ke kupon sebelumnya. Tidak pernah menekan tombol untuk menyelesaikan pesanan.",
+      "キャンペーンを探して自動でエントリーする": "Cari kampanye dan ikuti secara otomatis",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "Saat membuka halaman Rakuten, periksa kampanye di halaman utama setiap 12 jam dan ikuti yang belum Anda ikuti.",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Anda dapat mengubahnya kapan saja dari ikon di bilah alat (popup).",
+      "この内容で始める": "Mulai dengan pengaturan ini",
+      "設定しました。このタブは閉じてかまいません。": "Pengaturan disimpan. Anda boleh menutup tab ini.",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Tindakan otomatis (seperti mengambil kupon otomatis) belum diaktifkan.",
+      "確認して有効にする": "Tinjau dan aktifkan"
     },
     "ko": {
       "楽天 ￥{p}{via}": "라쿠텐 ¥{p}{via}",
@@ -669,7 +695,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "(배송비 포함 비교. 라쿠텐 포인트 적립은 포함하지 않습니다)",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(표시 가격 비교. 배송비·라쿠텐 포인트 적립은 포함하지 않습니다)",
       "（送料込みの比較。ポイント還元は含みません）": "(배송비 포함 비교. 포인트 적립은 포함하지 않습니다)",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "(표시 가격 비교. 배송비·포인트 적립은 포함하지 않습니다)"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(표시 가격 비교. 배송비·포인트 적립은 포함하지 않습니다)",
+      "自動で行う操作の確認": "자동으로 실행되는 작업 확인",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "다음 작업은 버튼을 누르지 않아도 로그인된 라쿠텐 계정에서 실행됩니다. 사용할 항목을 선택하고 \"이 설정으로 시작\"을 누르세요. 누르기 전까지는 아무것도 실행하지 않습니다.",
+      "クーポンを自動で獲得する": "쿠폰 자동 받기",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "상품 페이지를 열면 그 페이지의 쿠폰을 받습니다(수량이 한정된 쿠폰도 받습니다).",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "주문 확인 화면에서 가장 유리한 쿠폰으로 자동 전환",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "전환한 뒤 할인이 줄었다면 원래 쿠폰으로 되돌립니다. 주문 확정 버튼은 누르지 않습니다.",
+      "キャンペーンを探して自動でエントリーする": "캠페인을 찾아 자동으로 응모",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "라쿠텐 페이지를 열면 12시간마다 메인 페이지의 캠페인을 확인하고, 아직 응모하지 않은 캠페인에 응모합니다.",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "나중에 툴바 아이콘(팝업)에서 언제든지 바꿀 수 있습니다.",
+      "この内容で始める": "이 설정으로 시작",
+      "設定しました。このタブは閉じてかまいません。": "설정했습니다. 이 탭은 닫아도 됩니다.",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "자동으로 실행되는 작업(쿠폰 자동 받기 등)이 아직 켜져 있지 않습니다.",
+      "確認して有効にする": "확인하고 켜기"
     },
     "vi": {
       "楽天 ￥{p}{via}": "Rakuten ¥{p}{via}",
@@ -892,7 +931,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng Rakuten)",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng Rakuten)",
       "（送料込みの比較。ポイント還元は含みません）": "(So sánh đã gồm phí ship. Không tính điểm thưởng)",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng)"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "(So sánh giá niêm yết. Không tính phí ship và điểm thưởng)",
+      "自動で行う操作の確認": "Xác nhận các thao tác tự động",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "Các thao tác sau sẽ được thực hiện trên tài khoản Rakuten đang đăng nhập mà bạn không cần nhấn nút. Hãy chọn những mục muốn dùng rồi nhấn \"Bắt đầu với cài đặt này\". Trước khi bạn nhấn, không thao tác nào được thực hiện.",
+      "クーポンを自動で獲得する": "Tự động nhận phiếu giảm giá",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "Khi mở trang sản phẩm, nhận các phiếu giảm giá trên trang đó (kể cả phiếu có số lượng giới hạn).",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "Tự động chuyển sang phiếu giảm giá có lợi nhất ở màn hình xác nhận đơn hàng",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "Nếu mức giảm giá ít đi sau khi chuyển, sẽ chuyển lại phiếu trước đó. Không bao giờ nhấn nút xác nhận đặt hàng.",
+      "キャンペーンを探して自動でエントリーする": "Tìm chiến dịch và tự động đăng ký",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "Khi mở trang Rakuten, cứ 12 giờ kiểm tra các chiến dịch trên trang chủ một lần và đăng ký những chiến dịch bạn chưa đăng ký.",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Bạn có thể thay đổi bất cứ lúc nào từ biểu tượng trên thanh công cụ (cửa sổ bật lên).",
+      "この内容で始める": "Bắt đầu với cài đặt này",
+      "設定しました。このタブは閉じてかまいません。": "Đã lưu cài đặt. Bạn có thể đóng thẻ này.",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Các thao tác tự động (như tự động nhận phiếu giảm giá) chưa được bật.",
+      "確認して有効にする": "Xem lại và bật"
     },
     "zh_CN": {
       "楽天 ￥{p}{via}": "乐天 ¥{p}{via}",
@@ -1115,7 +1167,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "（含运费比较，不含乐天积分返还）",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "（比较的是标价，不含运费和乐天积分返还）",
       "（送料込みの比較。ポイント還元は含みません）": "（含运费比较，不含积分返还）",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "（比较的是标价，不含运费和积分返还）"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "（比较的是标价，不含运费和积分返还）",
+      "自動で行う操作の確認": "确认自动执行的操作",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "以下操作无需您按下按钮，就会在已登录的乐天账户中执行。请选择要使用的项目，然后按“按此设置开始”。在您按下之前，不会执行任何操作。",
+      "クーポンを自動で獲得する": "自动领取优惠券",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "打开商品页面时，领取该页面的优惠券（包括数量有限的优惠券）。",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "在订单确认页面自动切换为最划算的优惠券",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "如果切换后折扣变少，会切换回原来的优惠券。不会按下确定订单的按钮。",
+      "キャンペーンを探して自動でエントリーする": "查找活动并自动报名",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "打开乐天页面时，每12小时检查一次首页上的活动，并报名尚未报名的活动。",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "之后可随时通过工具栏图标（弹出窗口）更改。",
+      "この内容で始める": "按此设置开始",
+      "設定しました。このタブは閉じてかまいません。": "已设置。可以关闭此标签页。",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "自动执行的操作（如自动领取优惠券）尚未启用。",
+      "確認して有効にする": "确认并启用"
     },
     "zh_TW": {
       "楽天 ￥{p}{via}": "樂天 ¥{p}{via}",
@@ -1338,7 +1403,20 @@
       "（送料込みの比較。楽天のポイント還元は含みません）": "（含運費比較，不含樂天點數回饋）",
       "（表示価格の比較。送料・楽天のポイント還元は含みません）": "（比較的是標價，不含運費與樂天點數回饋）",
       "（送料込みの比較。ポイント還元は含みません）": "（含運費比較，不含點數回饋）",
-      "（表示価格の比較。送料・ポイント還元は含みません）": "（比較的是標價，不含運費與點數回饋）"
+      "（表示価格の比較。送料・ポイント還元は含みません）": "（比較的是標價，不含運費與點數回饋）",
+      "自動で行う操作の確認": "確認自動執行的操作",
+      "次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。": "以下操作不需要您按下按鈕，就會在已登入的樂天帳戶中執行。請選擇要使用的項目，然後按「依此設定開始」。在您按下之前，不會執行任何操作。",
+      "クーポンを自動で獲得する": "自動領取優惠券",
+      "商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。": "開啟商品頁面時，領取該頁面的優惠券（包括數量有限的優惠券）。",
+      "注文確認画面で、いちばん得なクーポンに自動で切り替える": "在訂單確認頁面自動切換為最划算的優惠券",
+      "切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。": "如果切換後折扣變少，會切換回原本的優惠券。不會按下確定訂單的按鈕。",
+      "キャンペーンを探して自動でエントリーする": "尋找活動並自動報名",
+      "楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。": "開啟樂天頁面時，每12小時檢查一次首頁上的活動，並報名尚未報名的活動。",
+      "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "之後可隨時透過工具列圖示（彈出視窗）變更。",
+      "この内容で始める": "依此設定開始",
+      "設定しました。このタブは閉じてかまいません。": "已設定。可以關閉此分頁。",
+      "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "自動執行的操作（如自動領取優惠券）尚未啟用。",
+      "確認して有効にする": "確認並啟用"
     }
   };
 })();

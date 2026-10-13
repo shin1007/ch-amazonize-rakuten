@@ -10,6 +10,25 @@ const health = AZR.health;
 // content script が要る記録（キャンペーンの自動エントリーを1回にする印）は azr:entryOnce で service worker が持つ。
 chrome.storage.session.setAccessLevel?.({ accessLevel: 'TRUSTED_CONTEXTS' })?.catch?.(() => {});
 
+/*
+ * 自動で行う操作（クーポンの自動獲得・自動切り替え・キャンペーンの自動エントリー）は、同意を取るまで動かさない。
+ * 入れた直後（と、同意の前から使っている人の更新時）に1度だけ、選んでもらうページを開く。
+ * 閉じられても、ポップアップに同じページへの案内が出る。
+ */
+const WELCOME_PAGE = '/src/welcome/welcome.html';
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason !== 'install' && reason !== 'update') return;
+  try {
+    const { consentAt } = await chrome.storage.sync.get({ consentAt: 0 });
+    const { azrWelcomeShown } = await chrome.storage.local.get('azrWelcomeShown');
+    if (consentAt || azrWelcomeShown) return;
+    await chrome.storage.local.set({ azrWelcomeShown: Date.now() });
+    await chrome.tabs.create({ url: WELCOME_PAGE });
+  } catch (e) {
+    console.warn('[AZR] 同意のページを開けない:', e);
+  }
+});
+
 // 店舗ごとのキー（shop:<店舗>）で持っていた閉店判定は azrShops にまとめた。古いキーを消す
 chrome.runtime.onInstalled.addListener(async () => {
   try {
@@ -1176,9 +1195,9 @@ async function autoScanOnVisit(extraLinks = []) {
   if (scanState.running) return { ok: false, skipped: 'running' };
 
   const cfg = await chrome.storage.sync.get({
-    enabled: true, campaignScanOnTop: true, campaignScanEntry: true
+    enabled: true, campaignScanOnTop: true, campaignScanEntry: true, consentAt: 0
   });
-  if (!cfg.enabled || cfg.campaignScanOnTop === false) return { ok: false, skipped: 'off' };
+  if (!cfg.enabled || cfg.campaignScanOnTop === false || !cfg.consentAt) return { ok: false, skipped: 'off' };
 
   const { azrAutoScanAt = 0 } = await chrome.storage.local.get('azrAutoScanAt');
   const entry = cfg.campaignScanEntry !== false;
