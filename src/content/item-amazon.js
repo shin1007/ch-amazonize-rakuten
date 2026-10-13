@@ -199,11 +199,13 @@ ${how}` },
       const { sure } = matchLabel({ byJan: pick.byJan, byModel: pick.byModel, score: pick.item.score, variants: data.variants?.length || 0, pack: AZR.amazon.samePack(data.pageTitle || data.title, pick.item.title) });
       diff = diffLine(site, data, pick.item, sure, home);
     }
+    const note = site.disclosure();
+    note.append(AZR.settingsLink()); // 注記の行の右に添える
     box.replaceChildren(
       itemRow(site, 'code', results.code, code, data),
       itemRow(site, 'title', results.title, code, data),
       h('div.azr-amz-diff-slot', diff),   // 値差の1行ぶんは最初から確保する
-      site.disclosure()
+      note
     );
   }
 

@@ -124,9 +124,7 @@
   "動画を読み込めませんでした": "Could not load the video",
   "有効": "Enabled",
   "表示": "Display",
-  "商品ページをAmazon風にする": "Restyle item pages like Amazon",
   "検索結果の広告を目立たなくする": "De-emphasize ads in search results",
-  "かご・クーポン": "Cart & coupons",
   "かごの合計金額を表示": "Show the cart total",
   "商品ページにクーポンを表示": "Show coupons on item pages",
   "開いたときに自動で獲得する": "Get them automatically when opened",
@@ -226,12 +224,16 @@
   "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "You can change these anytime from the toolbar icon (popup).",
   "この内容で始める": "Start with these settings",
   "設定しました。このタブは閉じてかまいません。": "Saved. You can close this tab.",
-  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Automatic actions (such as getting coupons automatically) are not enabled yet.",
   "確認して有効にする": "Review and enable",
   "楽天市場で自動で行う操作": "Automatic actions on Rakuten Ichiba",
   "ほかのサイトの価格を出す": "Show prices from other sites",
   "楽天の商品ページ": "Rakuten item pages",
   "Amazonの商品ページ": "Amazon item pages",
   "Yahoo!ショッピングの商品ページ": "Yahoo! Shopping item pages",
-  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Item pages on Amazon, Rakuten and Yahoo! Shopping can show the price of the same item on the other sites. Choose which to show."
+  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Item pages on Amazon, Rakuten and Yahoo! Shopping can show the price of the same item on the other sites. Choose which to show.",
+  "楽天の商品ページをAmazon風にする": "Restyle Rakuten item pages like Amazon",
+  "楽天市場のかご・クーポン": "Rakuten Ichiba cart & coupons",
+  "楽天市場のキャンペーン": "Rakuten Ichiba campaigns",
+  "楽天市場で自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Automatic actions on Rakuten Ichiba (such as getting coupons automatically) are not enabled yet.",
+  "表示の設定": "Display settings"
 }

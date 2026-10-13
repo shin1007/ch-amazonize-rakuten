@@ -124,9 +124,7 @@
   "動画を読み込めませんでした": "Không tải được video",
   "有効": "Bật",
   "表示": "Hiển thị",
-  "商品ページをAmazon風にする": "Đổi trang sản phẩm sang kiểu Amazon",
   "検索結果の広告を目立たなくする": "Làm quảng cáo trong kết quả tìm kiếm bớt nổi bật",
-  "かご・クーポン": "Giỏ hàng & phiếu giảm giá",
   "かごの合計金額を表示": "Hiện tổng tiền giỏ hàng",
   "商品ページにクーポンを表示": "Hiện phiếu giảm giá trên trang sản phẩm",
   "開いたときに自動で獲得する": "Tự động nhận khi mở",
@@ -226,12 +224,16 @@
   "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Bạn có thể thay đổi bất cứ lúc nào từ biểu tượng trên thanh công cụ (cửa sổ bật lên).",
   "この内容で始める": "Bắt đầu với cài đặt này",
   "設定しました。このタブは閉じてかまいません。": "Đã lưu cài đặt. Bạn có thể đóng thẻ này.",
-  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Các thao tác tự động (như tự động nhận phiếu giảm giá) chưa được bật.",
   "確認して有効にする": "Xem lại và bật",
   "楽天市場で自動で行う操作": "Thao tác tự động trên Rakuten Ichiba",
   "ほかのサイトの価格を出す": "Hiện giá từ trang khác",
   "楽天の商品ページ": "Trang sản phẩm Rakuten",
   "Amazonの商品ページ": "Trang sản phẩm Amazon",
   "Yahoo!ショッピングの商品ページ": "Trang sản phẩm Yahoo! Shopping",
-  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Trang sản phẩm Amazon, Rakuten và Yahoo! Shopping có thể hiện giá của cùng sản phẩm trên các trang khác. Hãy chọn mục muốn hiện."
+  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Trang sản phẩm Amazon, Rakuten và Yahoo! Shopping có thể hiện giá của cùng sản phẩm trên các trang khác. Hãy chọn mục muốn hiện.",
+  "楽天の商品ページをAmazon風にする": "Đổi giao diện trang sản phẩm Rakuten giống Amazon",
+  "楽天市場のかご・クーポン": "Giỏ hàng & phiếu giảm giá Rakuten Ichiba",
+  "楽天市場のキャンペーン": "Chiến dịch Rakuten Ichiba",
+  "楽天市場で自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Các thao tác tự động trên Rakuten Ichiba (như tự nhận phiếu giảm giá) chưa được bật.",
+  "表示の設定": "Cài đặt hiển thị"
 }

@@ -326,7 +326,9 @@
                 }
                 wrap.appendChild(row);
             }
-            wrap.appendChild(site.disclosure());
+            const note = site.disclosure();
+            note.append(AZR.settingsLink()); // 注記の行の右に添える
+            wrap.appendChild(note);
 
             site.place(wrap);
         };
