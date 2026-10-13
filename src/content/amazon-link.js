@@ -338,13 +338,34 @@
             rebuild();
             resolveTitleTop().then(() => { phase = 'done'; rebuild(); });
             if (site.checkShops) verifyBest();
-            let timer;
-            new MutationObserver(() => {
-                clearTimeout(timer);
-                timer = setTimeout(createBtn, 500);
-            }).observe(document.body, { childList: true, subtree: true });
+            keepPlaced(site.id, createBtn);
         });
     };
+
+    /*
+     * Amazonはページの一部を描き直すことがあり（選択肢の切り替えなど）、置いた欄ごと消える。消えたら置き直す。
+     * 楽天・Yahoo!の2つの欄を1つの見張りで見る。Amazonのページは変化が非常に多いので、変化のたびには何もせず、
+     * 自分の欄が消えているときだけ、描き直しが落ち着くよう少し待ってから置き直す。
+     */
+    const keepers = new Map(); // 欄のid → 置き直す関数
+    let keepTimer = null;
+    let keepObserver = null;
+    function keepPlaced(id, place) {
+        keepers.set(id, place);
+        if (keepObserver) return;
+        keepObserver = new MutationObserver(() => {
+            if (keepTimer) return;
+            for (const key of keepers.keys()) {
+                if (document.getElementById(key)) continue;
+                keepTimer = setTimeout(() => {
+                    keepTimer = null;
+                    for (const fn of keepers.values()) fn(); // 置いてあるものは createBtn がそのまま返す
+                }, 500);
+                return;
+            }
+        });
+        keepObserver.observe(document.body, { childList: true, subtree: true });
+    }
 
     if (AZR.settings.rakutenLink) runSite(RAKUTEN);
     if (AZR.settings.yahooPrice) runSite(YAHOO);

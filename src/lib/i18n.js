@@ -8,6 +8,10 @@
  * 対応していない言語なら英語にする。設定を読み込んだ後に AZR.setLanguage を呼ぶ
  * （settings.js の loadSettings がやる）。それまでは自動選択の言語。
  * 訳は tools/translations/<言語>.json に置き、node tools/build-locales.mjs で i18n-data.js と _locales にする。
+ *
+ * i18n-data.js（全言語で約120KB）は content script には入れない。日本語なら訳は要らず、ほかの言語でも要るのは1言語分だけなので、
+ * loadMessages が service worker から自分の言語の分（足りない文言は英語で埋めたもの）を受け取り、chrome.storage.local に覚えておく。
+ * 次からは storage から読むだけで済む（拡張を更新したら版が変わるので取り直す）。
  * 表示言語の取得に失敗したとき（テストなど）は日本語のまま。
  */
 (() => {
@@ -45,6 +49,18 @@
     return code;
   };
   AZR.setLanguage('auto');
+
+  /** 今の言語の訳をそろえる。content script の loadSettings が、設定を読んだ後に待つ */
+  AZR.loadMessages = async () => {
+    if (AZR.isJa || AZR.messages?.[AZR.lang]) return;
+    const lang = AZR.lang;
+    try {
+      const key = `azrI18n:${lang}:${chrome.runtime.getManifest().version}`;
+      let dict = (await chrome.storage.local.get(key))[key];
+      if (!dict) dict = await chrome.runtime.sendMessage({ type: 'azr:messages', lang });
+      if (dict && typeof dict === 'object') AZR.messages = { ...AZR.messages, [lang]: dict };
+    } catch { /* 取れなければ日本語の原文のまま */ }
+  };
 
   AZR.t = (ja, params) => {
     let s = ja;

@@ -31,7 +31,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.amazon.co.jp/*"],
-      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n-data.js", "src/lib/i18n.js", "src/lib/amazon-match.js", "src/lib/amazon-slot.js", "src/content/amazon-link-early.js"],
+      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n.js", "src/lib/amazon-match.js", "src/lib/amazon-slot.js", "src/content/amazon-link-early.js"],
       "run_at": "document_start"
     },
     {
@@ -41,7 +41,7 @@
     },
     {
       "matches": ["https://store.shopping.yahoo.co.jp/*"],
-      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n-data.js", "src/lib/i18n.js", "src/lib/dom.js", "src/lib/amazon-match.js", "src/content/item-amazon.js", "src/content/yahoo-item.js"],
+      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n.js", "src/lib/dom.js", "src/lib/amazon-match.js", "src/content/item-amazon.js", "src/content/yahoo-item.js"],
       "css": ["src/styles/amazon.css"],
       "run_at": "document_end"
     },
@@ -56,7 +56,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/content/boot.js",
@@ -71,7 +70,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/lib/coupon-model.js",
@@ -92,7 +90,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/content/boot.js",
@@ -113,7 +110,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/lib/coupon-model.js",
@@ -130,7 +126,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/content/boot.js",
@@ -145,7 +140,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/content/boot.js",
@@ -160,7 +154,6 @@
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
-        "src/lib/i18n-data.js",
         "src/lib/i18n.js",
         "src/lib/dom.js",
         "src/content/boot.js",

@@ -45,6 +45,7 @@
         const stored = await chrome.storage.sync.get(DEFAULTS);
         AZR.settings = { ...DEFAULTS, ...stored };
         AZR.setLanguage?.(AZR.settings.language);
+        await AZR.loadMessages?.();
       } catch {
         AZR.settings = { ...DEFAULTS };
       }

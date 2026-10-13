@@ -70,3 +70,13 @@ test('説明: 登録していない id は種類から作る', () => {
   assert.match(AZR.health.label('warn:購入エリア'), /^警告: /);
   assert.equal(AZR.health.label('unknown.id'), 'unknown.id');
 });
+
+test('content script には1言語分の訳だけを渡し、足りない文言は英語で埋める', async () => {
+  const storage = {};
+  const sw = loadServiceWorker({ storage });
+  const ko = await sw.messagesFor('ko');
+  assert.equal(ko['閉じる'], sw.AZR.messages.ko['閉じる']);
+  assert.ok(Object.keys(ko).length >= Object.keys(sw.AZR.messages.en).length);
+  assert.ok(Object.keys(storage).some((k) => k.startsWith('azrI18n:ko:')));
+  assert.equal(await sw.messagesFor('xx'), null);
+});

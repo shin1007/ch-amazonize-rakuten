@@ -5,6 +5,8 @@ importScripts("/src/lib/amazon-match.js");
 // セルフチェック（開発版だけ）。記録とバッジはこのファイルの末尾
 importScripts("/src/lib/health.js");
 const health = AZR.health;
+// 表示文言の訳（全言語）。content script には入れず、ここから自分の言語の分だけ渡す（i18n.js の loadMessages）
+importScripts("/src/lib/i18n-data.js");
 
 // session storage は content script に開かない（以前は開いていた。その設定が残っていれば戻す）。
 // content script が要る記録（キャンペーンの自動エントリーを1回にする印）は azr:entryOnce で service worker が持つ。
@@ -1265,7 +1267,26 @@ async function autoScanOnVisit(extraLinks = []) {
 const fromExtensionPage = (sender) => String(sender?.url || '').startsWith(chrome.runtime.getURL(''));
 const POPUP_ONLY = new Set(['azr:scanCampaigns', 'azr:enterCampaignUrls']);
 
+/** content script へ渡す1言語分の訳。足りない文言は英語で埋める（i18n.js の AZR.t と同じ順） */
+async function messagesFor(lang) {
+  const all = AZR.messages || {};
+  if (!all[lang]) return null;
+  const dict = { ...all.en, ...all[lang] };
+  const key = `azrI18n:${lang}:${chrome.runtime.getManifest().version}`;
+  // 古い版の訳は消す（更新のたびに溜まらないように）
+  const stored = await chrome.storage.local.get(null).catch(() => ({}));
+  const old = Object.keys(stored || {}).filter((k) => k.startsWith('azrI18n:') && k !== key);
+  if (old.length) await chrome.storage.local.remove(old).catch(() => {});
+  await chrome.storage.local.set({ [key]: dict }).catch(() => {});
+  return dict;
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === 'azr:messages') {
+    messagesFor(String(msg.lang || '')).then(sendResponse, () => sendResponse(null));
+    return true; // 非同期応答
+  }
+
   if (POPUP_ONLY.has(msg?.type) && !fromExtensionPage(sender)) {
     sendResponse({ ok: false, error: '対象外の呼び出しです' });
     return false;
