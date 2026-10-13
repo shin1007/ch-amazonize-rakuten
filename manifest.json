@@ -52,19 +52,22 @@
       "run_at": "document_end"
     },
     {
-      "matches": [
-        "https://www.rakuten.co.jp/*",
-        "https://item.rakuten.co.jp/*",
-        "https://search.rakuten.co.jp/*",
-        "https://cart.step.rakuten.co.jp/*",
-        "https://*.basket.step.rakuten.co.jp/*",
-        "https://basket.step.rakuten.co.jp/*",
-        "https://step.item.rakuten.co.jp/*",
-        "https://order.step.rakuten.co.jp/*",
-        "https://order.my.rakuten.co.jp/*",
-        "https://coupon.rakuten.co.jp/*",
-        "https://event.rakuten.co.jp/*"
+      "matches": ["https://www.rakuten.co.jp/*"],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/content/boot.js",
+        "src/content/top.js"
       ],
+      "css": ["src/styles/common.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://item.rakuten.co.jp/*"],
       "js": [
         "src/lib/settings.js",
         "src/lib/health.js",
@@ -74,25 +77,96 @@
         "src/lib/coupon-model.js",
         "src/lib/amazon-match.js",
         "src/content/boot.js",
-        "src/content/top.js",
         "src/content/item-images.js",
         "src/content/item-gallery.js",
         "src/content/item-coupons.js",
         "src/content/item.js",
-        "src/content/item-amazon.js",
-        "src/content/search.js",
+        "src/content/item-amazon.js"
+      ],
+      "css": ["src/styles/common.css", "src/styles/item.css", "src/styles/amazon.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://search.rakuten.co.jp/*"],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/content/boot.js",
+        "src/content/search.js"
+      ],
+      "css": ["src/styles/common.css", "src/styles/cart.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://cart.step.rakuten.co.jp/*",
+        "https://*.basket.step.rakuten.co.jp/*",
+        "https://basket.step.rakuten.co.jp/*",
+        "https://step.item.rakuten.co.jp/*",
+        "https://order.step.rakuten.co.jp/*"
+      ],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/lib/coupon-model.js",
+        "src/content/boot.js",
         "src/content/cart.js",
-        "src/content/coupon.js",
-        "src/content/checkout.js",
-        "src/content/orders.js",
+        "src/content/checkout.js"
+      ],
+      "css": ["src/styles/common.css", "src/styles/cart.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://order.my.rakuten.co.jp/*"],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/content/boot.js",
+        "src/content/orders.js"
+      ],
+      "css": ["src/styles/common.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://coupon.rakuten.co.jp/*"],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/content/boot.js",
+        "src/content/coupon.js"
+      ],
+      "css": ["src/styles/common.css"],
+      "run_at": "document_start",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://event.rakuten.co.jp/*"],
+      "js": [
+        "src/lib/settings.js",
+        "src/lib/health.js",
+        "src/lib/i18n-data.js",
+        "src/lib/i18n.js",
+        "src/lib/dom.js",
+        "src/content/boot.js",
         "src/content/campaign.js"
       ],
-      "css": [
-        "src/styles/common.css",
-        "src/styles/item.css",
-        "src/styles/amazon.css",
-        "src/styles/cart.css"
-      ],
+      "css": ["src/styles/common.css"],
       "run_at": "document_start",
       "all_frames": false
     },
