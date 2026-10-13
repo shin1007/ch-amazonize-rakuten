@@ -44,6 +44,11 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   } catch { /* 引き継げなくても既定（出す）で動く */ }
 });
 
+// 商品ページの欄の「表示の設定」から、設定の画面をタブで開く（content script からは開けない）
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg?.type === 'azr:openOptions') chrome.runtime.openOptionsPage().catch(() => {});
+});
+
 // 店舗ごとのキー（shop:<店舗>）で持っていた閉店判定は azrShops にまとめた。古いキーを消す
 chrome.runtime.onInstalled.addListener(async () => {
   try {

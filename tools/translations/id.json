@@ -124,9 +124,7 @@
   "動画を読み込めませんでした": "Video tidak dapat dimuat",
   "有効": "Aktif",
   "表示": "Tampilan",
-  "商品ページをAmazon風にする": "Ubah halaman produk ke gaya Amazon",
   "検索結果の広告を目立たなくする": "Kurangi kesan iklan di hasil pencarian",
-  "かご・クーポン": "Keranjang & kupon",
   "かごの合計金額を表示": "Tampilkan total keranjang",
   "商品ページにクーポンを表示": "Tampilkan kupon di halaman produk",
   "開いたときに自動で獲得する": "Ambil otomatis saat dibuka",
@@ -226,12 +224,16 @@
   "あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。": "Anda dapat mengubahnya kapan saja dari ikon di bilah alat (popup).",
   "この内容で始める": "Mulai dengan pengaturan ini",
   "設定しました。このタブは閉じてかまいません。": "Pengaturan disimpan. Anda boleh menutup tab ini.",
-  "自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Tindakan otomatis (seperti mengambil kupon otomatis) belum diaktifkan.",
   "確認して有効にする": "Tinjau dan aktifkan",
   "楽天市場で自動で行う操作": "Tindakan otomatis di Rakuten Ichiba",
   "ほかのサイトの価格を出す": "Tampilkan harga dari situs lain",
   "楽天の商品ページ": "Halaman produk Rakuten",
   "Amazonの商品ページ": "Halaman produk Amazon",
   "Yahoo!ショッピングの商品ページ": "Halaman produk Yahoo! Shopping",
-  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Halaman produk Amazon, Rakuten, dan Yahoo! Shopping dapat menampilkan harga produk yang sama di situs lain. Pilih yang ingin ditampilkan."
+  "Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。": "Halaman produk Amazon, Rakuten, dan Yahoo! Shopping dapat menampilkan harga produk yang sama di situs lain. Pilih yang ingin ditampilkan.",
+  "楽天の商品ページをAmazon風にする": "Ubah tampilan halaman produk Rakuten seperti Amazon",
+  "楽天市場のかご・クーポン": "Keranjang & kupon Rakuten Ichiba",
+  "楽天市場のキャンペーン": "Kampanye Rakuten Ichiba",
+  "楽天市場で自動で行う操作（クーポンの自動獲得など）は、まだ有効になっていません。": "Tindakan otomatis di Rakuten Ichiba (seperti mengambil kupon otomatis) belum diaktifkan.",
+  "表示の設定": "Pengaturan tampilan"
 }

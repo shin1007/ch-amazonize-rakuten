@@ -67,6 +67,20 @@
     } catch { /* extension context invalidated */ }
   };
 
+  // 商品ページの欄に添える、設定（ポップアップと同じ画面）をタブで開くリンク。開くのは service worker
+  AZR.settingsLink = () => {
+    const a = document.createElement('a');
+    a.href = '#';
+    a.textContent = AZR.t?.('表示の設定') ?? '表示の設定';
+    a.className = 'azr-settings-link';
+    Object.assign(a.style, { marginLeft: '8px', color: '#007185' });
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      chrome.runtime.sendMessage({ type: 'azr:openOptions' }).catch(() => {});
+    });
+    return a;
+  };
+
   AZR.log = (...args) => { if (AZR.settings.debug) console.log('%c[AZR]', 'color:#f60', ...args); };
   AZR.warn = (...args) => console.warn('[AZR]', ...args);
 })();
