@@ -213,11 +213,19 @@ async function run(names) {
     // item.js が debug 時に出す整理結果（{"moved":n,"dropped":[…],"left":[…]}）
     const galleryLog = logs.map((l) => l.match(/ gallery (\{.*\})$/)?.[1]).find(Boolean);
     Object.assign(report, galleryLog ? JSON.parse(galleryLog) : {});
+    // 表示までの時間（boot.js が付ける目印と、ページ側の DOMContentLoaded）
+    report.timing = await page.evaluate(() => {
+      const d = document.documentElement.dataset;
+      const nav = performance.getEntriesByType('navigation')[0];
+      return { boot: Number(d.azrBootMs), ready: Number(d.azrReadyMs), shown: Number(d.azrShownMs), dcl: Math.round(nav?.domContentLoadedEventStart || 0) };
+    });
     await page.screenshot({ path: join(OUT, `${name}.png`) });
     await page.screenshot({ path: join(OUT, `${name}-full.png`), fullPage: true });
     writeFileSync(join(OUT, `${name}.json`), JSON.stringify({ url, report, logs }, null, 2));
     console.log(`\n== ${name}  ${url}`);
     console.log(`購入エリア ${report.buybox ? `移設済み（ボタン: ${report.buyboxButtons.join(' / ') || 'なし'}）` : 'なし'} / ギャラリー ${report.gallery.length}枚 / 説明に残った画像 ${report.descriptionImages.length}枚 / 重複で消した ${report.dropped?.length ?? '?'}枚`);
+    const t = report.timing;
+    console.log(`  時間  起動 ${t.boot}ms / 商品データ ${t.ready}ms / 表示 ${t.shown}ms / DOMContentLoaded ${t.dcl}ms`);
     const short = (u) => (u || '').replace(/^https?:\/\/[^/]+/, '').replace(/\?.*$/, '');
     if (report.video) console.log(`  動画  ${report.video.state ?? '未移設'}${report.video.paused === false ? '（再生中！）' : ''}`);
     for (const s of report.scrollbars) console.log(`  スクロールバー  ${s}`);

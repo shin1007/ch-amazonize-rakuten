@@ -165,9 +165,20 @@
         let keyword = titleKw;
         let ranked = [];       // 候補商品（良い順）。先頭がリンク先
         let apiError = null;
+        /*
+         * 同じ問い合わせは1回にまとめる。商品名の検索は、JAN・型番で見つかっても必ず行う（下の resolveTitleTop）ので、
+         * JAN・型番の検索を待たずに最初から投げておく（以前は JAN → 型番 → 商品名 と1つずつ待っていた）。
+         */
+        const searches = new Map();
+        const search = (c) => {
+            const key = JSON.stringify(site.message(c));
+            if (!searches.has(key)) searches.set(key, apiSearch(c));
+            return searches.get(key);
+        };
+        search({ type: null, value: titleKw });
         const resolveKeyword = async () => {
             for (const c of candidates) {
-                const res = await apiSearch(c);
+                const res = await search(c);
                 if (res?.searchUrl) affiliateSearchUrls.set(c.value, res.searchUrl);
                 if (res?.error) { apiError = res.error; return; }
                 if (!res?.items?.length) continue;
@@ -185,7 +196,7 @@
         let phase = 'search';   // search: 楽天を検索中 / title: 商品名検索の上位を取得中 / done
             const resolveTitleTop = async () => {
             if (!code?.type) { titleTop = ranked[0] || null; return; }
-            const res = await apiSearch({ type: null, value: titleKw });
+            const res = await search({ type: null, value: titleKw });
             if (res?.searchUrl) affiliateSearchUrls.set(titleKw, res.searchUrl);
             const top = res?.items?.length && rankItems(res.items).filter(r => !r.mismatch && r.sim >= MIN_SCORE)[0];
             titleTop = top ? top.it : null;

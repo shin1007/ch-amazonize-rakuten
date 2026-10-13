@@ -40,6 +40,7 @@ export function loadServiceWorker({ fetch = async () => { throw new Error("fetch
     setTimeout, // 空で返ったときの読み直しの待ちに使う
     URL,
     URLSearchParams,
+    TextDecoder,
     AbortSignal: { timeout: () => null },
     chrome: {
       // manifest に update_url が無い = 開発版（セルフチェックが動く）

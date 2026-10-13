@@ -15,10 +15,14 @@
 
   // ちらつき防止: 再構成するページは一旦隠す。失敗しても必ず表示に戻す。
   let unhidden = false;
+  // 表示までの時間（ページの読み込み開始からのms）。tools/harness.mjs が読んで出す
+  const mark = (name) => { root.dataset[name] = String(Math.round(performance.now())); };
+  mark('azrBootMs');
   const unhide = () => {
     if (unhidden) return;
     unhidden = true;
     root.classList.remove('azr-preload');
+    mark('azrShownMs');
   };
   if (kind === 'item') {
     root.classList.add('azr-preload');
@@ -104,7 +108,7 @@
   }
 
   // 全モジュールの register が済んでから実行する
-  const start = () => queueMicrotask(() => main().catch((e) => { AZR.warn(e); unhide(); }));
+  const start = () => mark('azrReadyMs') || queueMicrotask(() => main().catch((e) => { AZR.warn(e); unhide(); }));
   (kind === 'item' ? itemDataReady() : AZR.domReady).then(start);
 
   AZR.onSettingsChanged?.(() => {

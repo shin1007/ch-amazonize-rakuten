@@ -411,3 +411,20 @@ test('Amazonの検索結果から配送料を読む（Cookieなしで読む、�
   assert.deepEqual({ ...sw.amazonShipping('<div>無料配送 10月13日 火曜日にお届け 初回のご注文の場合</div>') }, { kind: 'conditional', fee: null });
   assert.equal(sw.amazonShipping('<div>10月13日にお届け</div>'), null);
 });
+
+test('検索結果のページは「その他の結果」まで届いたら残りを受け取らない', async () => {
+  const enc = new TextEncoder();
+  const parts = ['<div>a</div>', '<h2 class="x">その他の結果</h2>', '<div>' + 'b'.repeat(1000) + '</div>', '<div>end</div>'];
+  let pulled = 0;
+  let cancelled = false;
+  const body = new ReadableStream({
+    pull(c) { if (pulled < parts.length) c.enqueue(enc.encode(parts[pulled++])); else c.close(); },
+    cancel() { cancelled = true; }
+  }, { highWaterMark: 0 });
+  const s = loadServiceWorker({ fetch: async () => ({ ok: true, status: 200, body }) });
+  const r = await s.amazonFetch('https://www.amazon.co.jp/s?k=x');
+  assert.equal(r.status, 'ok');
+  assert.ok(r.html.includes('その他の結果'));
+  assert.ok(!r.html.includes('end'));
+  assert.ok(cancelled);
+});
