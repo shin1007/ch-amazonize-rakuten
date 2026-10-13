@@ -105,8 +105,9 @@ async function run(names) {
 
   const { ctx, cleanup } = await launch({ withExtension: true });
   // 拡張の設定はストレージの既定値で動く。debug だけ立てて AZR.log を出させる。
+  // HARNESS_LANG=en のように言語を渡すと、表示言語を切り替えて試せる（訳を service worker から受け取る道を通る）
   const [sw] = ctx.serviceWorkers().length ? ctx.serviceWorkers() : [await ctx.waitForEvent('serviceworker')];
-  await sw.evaluate(() => chrome.storage.sync.set({ debug: true }));
+  await sw.evaluate((language) => chrome.storage.sync.set({ debug: true, ...(language ? { language } : {}) }), process.env.HARNESS_LANG || '');
 
   for (const name of names) {
     const url = readFileSync(join(FIXTURES, `${name}.url`), 'utf8').trim();

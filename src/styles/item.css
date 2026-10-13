@@ -3,6 +3,77 @@
 /* 再構成が終わるまでのちらつきを防ぐ。boot.js が必ず解除する */
 html.azr-preload body { visibility: hidden !important; }
 
+/* 作り直すまでの間（商品データのHTMLが届くまで。実測で0.3〜0.7秒）、真っ白にせず、出来上がりの形の枠を出す。
+ * body はまだ無いことが多いので、html の ::before 1つに背景で描く。形は .azr-grid の3列に合わせる。 */
+html.azr-preload::before {
+  --azr-sk-l: min(420px, calc((100vw - 48px) * .3));
+  --azr-sk-r: min(340px, calc((100vw - 48px) * .28));
+  --azr-sk-x: calc(48px + var(--azr-sk-l));
+  --azr-sk-c: calc(100vw - 96px - var(--azr-sk-l) - var(--azr-sk-r));
+  --azr-sk: linear-gradient(#eceeee, #eceeee);
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(#f3f4f4, #f3f4f4),
+    var(--azr-sk), var(--azr-sk), var(--azr-sk), var(--azr-sk), var(--azr-sk), var(--azr-sk), var(--azr-sk), var(--azr-sk);
+  background-size:
+    100% 56px,
+    var(--azr-sk-l) var(--azr-sk-l),
+    var(--azr-sk-l) 56px,
+    calc(var(--azr-sk-c) * .95) 22px,
+    calc(var(--azr-sk-c) * .7) 22px,
+    120px 14px,
+    180px 34px,
+    calc(var(--azr-sk-c) * .9) 96px,
+    var(--azr-sk-r) 320px;
+  background-position:
+    0 0,
+    24px 72px,
+    24px calc(84px + var(--azr-sk-l)),
+    var(--azr-sk-x) 76px,
+    var(--azr-sk-x) 108px,
+    var(--azr-sk-x) 146px,
+    var(--azr-sk-x) 186px,
+    var(--azr-sk-x) 240px,
+    calc(100vw - 24px - var(--azr-sk-r)) 72px;
+  animation: azr-skeleton 1s ease-in-out infinite alternate;
+}
+/* 1列になる幅（.azr-grid と同じ境目）では、画像の下に商品名と価格を並べる */
+@media (max-width: 1100px) {
+  html.azr-preload::before {
+    --azr-sk-l: min(420px, calc(100vw - 48px));
+    background-size:
+      100% 56px,
+      var(--azr-sk-l) var(--azr-sk-l),
+      var(--azr-sk-l) 56px,
+      calc((100vw - 48px) * .95) 22px,
+      calc((100vw - 48px) * .7) 22px,
+      120px 14px,
+      180px 34px,
+      0 0,
+      0 0;
+    background-position:
+      0 0,
+      24px 72px,
+      24px calc(84px + var(--azr-sk-l)),
+      24px calc(160px + var(--azr-sk-l)),
+      24px calc(192px + var(--azr-sk-l)),
+      24px calc(230px + var(--azr-sk-l)),
+      24px calc(260px + var(--azr-sk-l)),
+      0 0,
+      0 0;
+  }
+}
+@keyframes azr-skeleton { from { opacity: 1; } to { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) {
+  html.azr-preload::before { animation: none; }
+}
+
 /* 楽天市場の共通ヘッダー（.azr-header）は残す。item.js の mountHeader を参照 */
 html.azr-simplified body > *:not(#azr-item-root):not(.azr-header) { display: none !important; }
 html.azr-simplified body {

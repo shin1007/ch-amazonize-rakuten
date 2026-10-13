@@ -42,9 +42,11 @@ if (cmd === 'split') {
   const langs = readdirSync(TR).filter((f) => /^[a-z]{2}(_[A-Z]{2})?\.json$/.test(f)).map((f) => f.replace('.json', ''));
   const data = {};
   for (const lang of langs) data[lang] = read(join(TR, `${lang}.json`));
-  writeFileSync(join(ROOT, 'src/lib/i18n-data.js'), `/* 自動生成（node tools/build-locales.mjs）。訳の一覧。使い方は i18n.js */
+  writeFileSync(join(ROOT, 'src/lib/i18n-data.js'), `/* 自動生成（node tools/build-locales.mjs）。訳の一覧。使い方は i18n.js
+ * ポップアップ・確認のページと service worker が読む。content script は読まない（service worker から自分の言語の分だけ受け取る）。 */
 (() => {
-  const AZR = (window.AZR = window.AZR || {});
+  const g = typeof window !== 'undefined' ? window : self;
+  const AZR = (g.AZR = g.AZR || {});
   AZR.messages = ${JSON.stringify(data, null, 2).split(String.fromCharCode(10)).join(String.fromCharCode(10) + '  ')};
 })();
 `);

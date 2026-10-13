@@ -1,6 +1,8 @@
-/* 自動生成（node tools/build-locales.mjs）。訳の一覧。使い方は i18n.js */
+/* 自動生成（node tools/build-locales.mjs）。訳の一覧。使い方は i18n.js
+ * ポップアップ・確認のページと service worker が読む。content script は読まない（service worker から自分の言語の分だけ受け取る）。 */
 (() => {
-  const AZR = (window.AZR = window.AZR || {});
+  const g = typeof window !== 'undefined' ? window : self;
+  const AZR = (g.AZR = g.AZR || {});
   AZR.messages = {
     "en": {
       "楽天 ￥{p}{via}": "Rakuten ¥{p}{via}",
