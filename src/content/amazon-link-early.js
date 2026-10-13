@@ -3,8 +3,8 @@
 (async () => {
     const AZR = (window.AZR = window.AZR || {});
     await AZR.loadSettings();
-    const { rakutenLink, yahooPrice } = AZR.settings;
-    if (!AZR.settings.enabled || !(rakutenLink || yahooPrice)) return;
+    const { rakutenLink, amazonPageYahoo } = AZR.settings;
+    if (!AZR.settings.enabled || !(rakutenLink || amazonPageYahoo)) return;
     const { findPrice, newWrap, loadingRow, disclosure, yahooDisclosure, place } = AZR.slot;
 
     const ready = () => document.getElementById('productTitle') && findPrice();
@@ -14,7 +14,7 @@
         let prev = null;
         for (const [on, id, text, note] of [
             [rakutenLink, 'rakuten-link-btn', AZR.t('楽天の商品情報を取得中…'), disclosure],
-            [yahooPrice, 'yahoo-link-btn', AZR.t('Yahoo!ショッピングの商品情報を取得中…'), yahooDisclosure]
+            [amazonPageYahoo, 'yahoo-link-btn', AZR.t('Yahoo!ショッピングの商品情報を取得中…'), yahooDisclosure]
         ]) {
             if (!on) continue;
             const wrap = newWrap(id);

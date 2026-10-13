@@ -107,3 +107,6 @@ button:not(.primary) {
 footer label.lang { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 footer select { flex: 1; }
 .consent { margin: 8px 0 0; padding: 6px 8px; background: #fff8e5; border: 1px solid #f0c36d; border-radius: 6px; font-size: 12px; }
+/* ほかのサイトの価格。開いている商品ページのサイトごとに1行 */
+.sites { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; }
+.sites > span { flex-basis: 100%; color: #565959; font-size: 12px; }

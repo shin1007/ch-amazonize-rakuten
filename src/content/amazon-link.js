@@ -8,7 +8,7 @@
     }
     if (!document.getElementById('productTitle')) return;
     await AZR.loadSettings();
-    if (!AZR.settings.enabled || !(AZR.settings.rakutenLink || AZR.settings.yahooPrice)) return;
+    if (!AZR.settings.enabled || !(AZR.settings.rakutenLink || AZR.settings.amazonPageYahoo)) return;
   const tr = AZR.t;
     
     const title = document.getElementById('productTitle').innerText.trim();
@@ -368,5 +368,5 @@
     }
 
     if (AZR.settings.rakutenLink) runSite(RAKUTEN);
-    if (AZR.settings.yahooPrice) runSite(YAHOO);
+    if (AZR.settings.amazonPageYahoo) runSite(YAHOO);
 })();

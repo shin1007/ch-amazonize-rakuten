@@ -17,3 +17,8 @@ label b { color: #0f1111; font-size: 14px; }
 .note { color: #565959; font-size: 12px; }
 button.primary { padding: 8px 20px; font-size: 14px; border: 1px solid #fcd200; border-radius: 8px; background: #ffd814; cursor: pointer; }
 .status { min-height: 1.6em; color: #067d62; }
+main > h2:not(:first-of-type) { margin-top: 28px; }
+.sites { display: flex; flex-wrap: wrap; align-items: center; column-gap: 20px; padding: 8px 0; border-top: 1px solid #eaeded; }
+.sites > b { flex-basis: 100%; }
+.sites label { border-top: 0; padding: 2px 0; align-items: center; }
+.sites label input { margin-top: 0; }

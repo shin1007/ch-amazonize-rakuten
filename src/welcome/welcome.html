@@ -8,12 +8,24 @@
 <body>
   <main>
     <h1>Amazonize Rakuten</h1>
-    <h2>自動で行う操作の確認</h2>
+    <h2>楽天市場で自動で行う操作</h2>
     <p>次の操作は、あなたがボタンを押さなくても、ログイン中の楽天のアカウントで実行されます。使うものを選んで「この内容で始める」を押してください。押すまでは、どれも実行しません。</p>
 
     <label><input type="checkbox" id="couponAutoGrab"> <span><b>クーポンを自動で獲得する</b><br>商品ページを開いたとき、そのページのクーポンを獲得します（数に限りのあるクーポンも獲得します）。</span></label>
     <label><input type="checkbox" id="couponAutoSwitch"> <span><b>注文確認画面で、いちばん得なクーポンに自動で切り替える</b><br>切り替えた後に割引が減っていたら、元のクーポンに戻します。注文の確定は押しません。</span></label>
     <label><input type="checkbox" id="campaignAutoScan"> <span><b>キャンペーンを探して自動でエントリーする</b><br>楽天のページを開いたとき、12時間おきにトップページのキャンペーンを確かめ、未エントリーのものにエントリーします。</span></label>
+
+    <h2>ほかのサイトの価格を出す</h2>
+    <p>Amazon・楽天・Yahoo!ショッピングの商品ページに、ほかのサイトでの同じ商品の価格を出します。出すものを選んでください。</p>
+    <div class="sites"><b>楽天の商品ページ</b>
+      <label><input type="checkbox" data-key="amazonPrice"> Amazon</label>
+      <label><input type="checkbox" data-key="yahooPrice"> Yahoo!ショッピング</label></div>
+    <div class="sites"><b>Amazonの商品ページ</b>
+      <label><input type="checkbox" data-key="rakutenLink"> 楽天</label>
+      <label><input type="checkbox" data-key="amazonPageYahoo"> Yahoo!ショッピング</label></div>
+    <div class="sites"><b>Yahoo!ショッピングの商品ページ</b>
+      <label><input type="checkbox" data-key="yahooItem"> Amazon</label>
+      <label><input type="checkbox" data-key="yahooPageRakuten"> 楽天</label></div>
 
     <p class="note">あとからツールバーのアイコン（ポップアップ）で、いつでも変えられます。</p>
     <button id="start" class="primary">この内容で始める</button>

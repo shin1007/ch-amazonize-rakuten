@@ -31,6 +31,19 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   }
 });
 
+// Amazonの商品ページのYahoo!の価格は yahooPrice、Yahoo!の商品ページの楽天の価格は yahooItem と一緒だった。
+// 分けた設定に、切っていた人の選択を引き継ぐ
+chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason !== 'update') return;
+  try {
+    const s = await chrome.storage.sync.get(['yahooPrice', 'yahooItem', 'amazonPageYahoo', 'yahooPageRakuten']);
+    const patch = {};
+    if (s.yahooPrice === false && s.amazonPageYahoo === undefined) patch.amazonPageYahoo = false;
+    if (s.yahooItem === false && s.yahooPageRakuten === undefined) patch.yahooPageRakuten = false;
+    if (Object.keys(patch).length) await chrome.storage.sync.set(patch);
+  } catch { /* 引き継げなくても既定（出す）で動く */ }
+});
+
 // 店舗ごとのキー（shop:<店舗>）で持っていた閉店判定は azrShops にまとめた。古いキーを消す
 chrome.runtime.onInstalled.addListener(async () => {
   try {
