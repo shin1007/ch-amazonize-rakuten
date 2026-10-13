@@ -253,14 +253,43 @@ async function acquireFloatingCoupon(getKey) {
  */
 const RATINGS_TTL_MS = 12 * 60 * 60 * 1000;
 
+/**
+ * 応答の本文を少しずつ読み、enough(読んだ文字列) が true になったら通信を切って、そこまでを返す。
+ * レビューやAmazonの検索結果のページは数百KBあるが、要るのは前の方だけなので、全部は受け取らない。
+ * 本文を少しずつ読めない応答（テストの差し替えなど）は丸ごと読む。
+ */
+async function readUntil(res, enough) {
+  const reader = res.body?.getReader?.();
+  if (!reader) return res.text();
+  const decoder = new TextDecoder();
+  let text = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return text + decoder.decode();
+    text += decoder.decode(value, { stream: true });
+    if (enough(text)) {
+      reader.cancel().catch(() => {});
+      return text;
+    }
+  }
+}
+
 /** 'itemInfo' / 'shopInfo' の reviewRatings。楽天自身が出さないもの（shouldBeDisplayed:false）は null。 */
+const ratingStart = (html, section) => new RegExp(`"${section}":\\{[^{}]*"reviewRatings":\\{`).exec(html);
+const RATING_TAIL = 600;
+/** その節の評価を読み切れるところまで届いたか（読み切ったら、ページの残りは読まない） */
+const ratingReady = (html, section) => {
+  const m = ratingStart(html, section);
+  return Boolean(m && html.length >= m.index + m[0].length + RATING_TAIL);
+};
+
 function parseRating(html, section) {
   // reviewRatings がその節の直下にあるものだけを拾う。ページには空の "itemInfo":{} も先に出てくるので、
   // 単に次の reviewRatings を探すと、後ろの shopInfo の評価を商品の評価と取り違える。
-  const m = new RegExp(`"${section}":\\{[^{}]*"reviewRatings":\\{`).exec(html);
+  const m = ratingStart(html, section);
   if (!m) return undefined;
   // 評価の分布（distribution）が続くが、そこには average / totalCount の名前は出てこない
-  const s = html.slice(m.index + m[0].length, m.index + m[0].length + 600);
+  const s = html.slice(m.index + m[0].length, m.index + m[0].length + RATING_TAIL);
   if (/"shouldBeDisplayed":false/.test(s)) return null;
   const avg = Number(s.match(/"average":([\d.]+)/)?.[1]);
   const count = Number(s.match(/"totalCount":(\d+)/)?.[1]);
@@ -284,7 +313,8 @@ async function reviewRatings(shopId, itemId) {
     health.check('rakuten.reviewPage', false, `HTTP ${res.status} ${url}`);
     return null;
   }
-  const html = await res.text();
+  // 商品とショップの評価が両方読めたら、残り（ほとんどがレビュー本文）は受け取らない
+  const html = await readUntil(res, (t) => ratingReady(t, 'shopInfo') && (!itemId || ratingReady(t, 'itemInfo')));
   const item = itemId ? parseRating(html, 'itemInfo') : null;
   const shop = parseRating(html, 'shopInfo');
   // どちらも見つからない = ページの形が変わった。覚えずに次も読みに行く。
@@ -377,8 +407,9 @@ function parseAmazonResult(asin, chunk) {
  * 画面には3件しか出ないのに、拡張は「その他の結果」から拾った別の商品を出していた）。
  * 実測でも、枠60件のうち「結果」に属するのは7件だけだった。ここから先は読まない。
  */
+const OTHER_RESULTS = /<h2[^>]*>(?:その他の結果|関連する検索結果|他の検索結果)<\/h2>/;
 function mainResults(html) {
-  const m = html.match(/<h2[^>]*>(?:その他の結果|関連する検索結果|他の検索結果)<\/h2>/);
+  const m = html.match(OTHER_RESULTS);
   return m ? html.slice(0, m.index) : html;
 }
 
@@ -434,6 +465,17 @@ function amazonBlocked(html) {
   return /validateCaptcha|api-services-support@amazon\.com|自動化されたアクセス/.test(html);
 }
 
+/*
+ * 検索結果のページは1MB近くあるが、使うのは「結果」の欄の先頭の数件だけ（parseAmazonSearch は8件まで）。
+ * 「その他の結果」の見出しが来たか、商品の枠が十分な数届いたら、残りは受け取らない。
+ * 枠の数は、広告を除いて8件そろうよう余裕を見る（最後の枠は途中で切れていることがある）。
+ */
+const AMAZON_ENOUGH_FRAMES = 20;
+function amazonEnough(html) {
+  if (OTHER_RESULTS.test(html)) return true;
+  return (html.match(/data-component-type="s-search-result"/g) || []).length > AMAZON_ENOUGH_FRAMES;
+}
+
 async function amazonFetch(url) {
   const res = await fetch(url, {
     credentials: 'omit',
@@ -441,7 +483,7 @@ async function amazonFetch(url) {
     headers: { 'Accept-Language': 'ja-JP,ja;q=0.9' }
   });
   if (!res.ok) return { status: res.status === 503 ? 'blocked' : 'error' };
-  const html = await res.text();
+  const html = await readUntil(res, amazonEnough);
   if (amazonBlocked(html)) return { status: 'blocked' };
   return { status: 'ok', html };
 }
@@ -1414,10 +1456,40 @@ const RL_PROXY = 'https://amazon-rakuten-link.shin1007.workers.dev/search';
  * Yahoo!の商品ページは、商品名の補正（JANで他店の名前を引く）とJANでの価格で同じ問い合わせを2回するし、
  * 商品ページを開き直すたびに同じ検索語で引く。中継Workerには同じIPから1分60回の制限があるので、無駄に数を使わない。
  * 制限に当たった（429）ときは、少し待って1度だけ引き直す。失敗した応答は覚えない。
+ *
+ * service worker は30秒ほどで止まり、メモリの relayCache は消える。商品ページを開くたびに止まった後から
+ * 始まることが多いので、成功した応答は session storage（ブラウザを閉じるまで残る）にも置く。
  */
 const RELAY_TTL_MS = 30 * 60 * 1000;
 const RELAY_RETRY_MS = 2000;
+const RELAY_STORE_MAX = 150; // 1件15KB前後。session storage の上限（10MB）に余裕を残す
 const relayCache = new Map(); // url → { at, promise }
+const saveRelaySerially = serialized();
+
+async function relayStored(url) {
+    try {
+        const { azrRelay: all = {} } = await chrome.storage.session.get('azrRelay');
+        const hit = all[url];
+        return hit && Date.now() - hit.at < RELAY_TTL_MS ? hit.res : null;
+    } catch {
+        return null; // session storage が使えない（テストなど）
+    }
+}
+
+function relayStore(url, res) {
+    if (!chrome.storage.session?.get) return null;
+    return saveRelaySerially(async () => {
+        const { azrRelay: all = {} } = await chrome.storage.session.get('azrRelay');
+        const now = Date.now();
+        for (const [k, v] of Object.entries(all)) if (now - v.at >= RELAY_TTL_MS) delete all[k];
+        all[url] = { at: now, res };
+        const keys = Object.keys(all);
+        if (keys.length > RELAY_STORE_MAX) {
+            for (const k of keys.sort((a, b) => all[a].at - all[b].at).slice(0, keys.length - RELAY_STORE_MAX)) delete all[k];
+        }
+        await chrome.storage.session.set({ azrRelay: all });
+    });
+}
 
 function relayFetch(url) {
     const now = Date.now();
@@ -1425,11 +1497,15 @@ function relayFetch(url) {
     const hit = relayCache.get(url);
     if (hit) return hit.promise;
     const promise = (async () => {
+        const stored = await relayStored(url);
+        if (stored) return stored;
         for (let i = 0; ; i++) {
             const r = await fetch(url, { credentials: 'omit' });
             const j = await r.json().catch(() => ({}));
             if (r.status === 429 && i === 0) { await new Promise((res) => setTimeout(res, RELAY_RETRY_MS)); continue; }
-            return { ok: r.ok, status: r.status, json: j };
+            const res = { ok: r.ok, status: r.status, json: j };
+            if (res.ok) relayStore(url, res);
+            return res;
         }
     })();
     relayCache.set(url, { at: now, promise });
@@ -1569,9 +1645,12 @@ async function rakutenPrice({ title, jan, model, hint = '' }) {
     const byName = [...[...exact].sort((a, b) => b.score - a.score),
         ...rest.filter((it) => !exact.includes(it) && it.score >= AMAZON_MIN_SCORE).sort((a, b) => b.score - a.score)];
     // 上から順に、店が開いているものを選ぶ（判定できないときは開いているとみなす）
+    // 上位5件の店を同時に問い合わせ、上から順に開いているものを選ぶ（判定はヘッダーだけで済むので軽い）
     const firstOpen = async (list) => {
-        for (const it of list.slice(0, 5)) {
-            if (!it.shop || (await rlIsShopOpen(it.shop)) !== false) return it;
+        const top = list.slice(0, 5);
+        const open = top.map((it) => (it.shop ? rlIsShopOpen(it.shop) : Promise.resolve(true)));
+        for (let i = 0; i < top.length; i++) {
+            if ((await open[i]) !== false) return top[i];
         }
         return null;
     };
@@ -1604,6 +1683,8 @@ async function rlIsShopOpen(shop) {
     let open;
     try {
         const r = await fetch(`https://www.rakuten.co.jp/${encodeURIComponent(shop)}/`, { credentials: 'omit', redirect: 'manual' });
+        // 判定はステータスとリダイレクトだけで決まる。店舗トップの本文（重い）は受け取らずに切る
+        r.body?.cancel?.().catch(() => {});
         if (r.type === 'opaqueredirect') open = false;
         else if (r.ok) open = true;
         else return null;

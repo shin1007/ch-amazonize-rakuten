@@ -195,7 +195,10 @@
     });
   }
 
-  /** SPAの経路変更を見張る。ページ遷移が起きないのでpollingで見るしかない。 */
+  /**
+   * SPAの経路変更を見張る。ページ遷移が起きないので、MAINワールドの state-bridge.js が history の呼び出しを
+   * 見て postMessage で知らせてくる（azr:route）。届かなかったときの保険に、2秒ごとにも見る。
+   */
   function onRouteChange(cb) {
     let last = location.pathname;
     const check = () => {
@@ -203,7 +206,10 @@
       last = location.pathname;
       cb(last);
     };
-    setInterval(check, 400);
+    window.addEventListener('message', (e) => {
+      if (e.source === window && e.data?.source === 'azr:route') check();
+    });
+    setInterval(check, 2000);
     window.addEventListener('popstate', check);
   }
 

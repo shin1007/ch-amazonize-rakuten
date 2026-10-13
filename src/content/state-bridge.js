@@ -134,6 +134,9 @@
   }
 
   const MAX_BODY = 2_000_000; // 商品説明などで応答は大きい。無制限には読まない。
+  // 取り込むキーが1つも書かれていない応答は、JSONとして解析しない（ページの通信をすべて解析すると重い）
+  const HAS_STATE = new RegExp(`"(?:${OVERLAY_KEYS.join('|')})"\\s*:`);
+  const worthParsing = (t) => t && t.length <= MAX_BODY && HAS_STATE.test(t);
 
   const nativeFetch = window.fetch;
   if (typeof nativeFetch === 'function') {
@@ -144,7 +147,7 @@
           if (!res || !res.ok) return;
           if (!/json/i.test(res.headers.get('content-type') || '')) return;
           res.clone().text().then((t) => {
-            if (!t || t.length > MAX_BODY) return;
+            if (!worthParsing(t)) return;
             try { if (absorb(JSON.parse(t))) publish(false); } catch { /* JSONでなければ捨てる */ }
           }, () => {});
         } catch { /* ページ側の動きは絶対に止めない */ }
@@ -160,7 +163,7 @@
         this.addEventListener('load', () => {
           try {
             const t = this.responseType === '' || this.responseType === 'text' ? this.responseText : null;
-            if (!t || t.length > MAX_BODY) return;
+            if (!worthParsing(t)) return;
             if (absorb(JSON.parse(t))) publish(false);
           } catch { /* JSONでなければ捨てる */ }
         });
@@ -170,7 +173,8 @@
   }
 
   // 画面遷移（/cart → /order-confirmation）では __INITIAL_STATE__ が入れ替わる。
-  // 取りこぼしを避けるため、短い間隔でも読んで差分があるときだけ流す。
+  // 遷移（history の pushState / replaceState / popstate）とページの読み込みの節目で読み、差分があるときだけ流す。
+  // 以前は500msごとに見張っていたが、ページを開いている間ずっと動くので、節目で見るのを主にした。
   //
   // 重ねた応答を捨てるのは、画面そのもの（パスの先頭）が変わったときだけ。
   // クーポンを選ぶモーダルは /order-confirmation/coupon-usage という子の経路で、
@@ -180,13 +184,14 @@
   // 状態全体の抜き出しと JSON 化は重いので、毎回はやらない。流す中身の元になるもの
   // （__INITIAL_STATE__ の参照・重ねた応答・パス）がどれも変わっていなければ飛ばす。
   // __INITIAL_STATE__ が差し替えではなく中身だけ書き換えられる場合に備えて、
-  // 5秒に1回は変化の有無にかかわらず比べ直す。
+  // 6秒に1回は変化の有無にかかわらず比べ直す（取りこぼしの保険も兼ねて、3秒ごとにも軽く見る）。
   const screenOf = (path) => path.split('/')[1] || '';
-  const FULL_CHECK_EVERY = 10; // 500ms × 10
+  const SAFETY_MS = 3000;
+  const FULL_CHECK_EVERY = 2; // 3秒 × 2
   let lastScreen = screenOf(location.pathname);
   let lastInputs = null;
   let tick = 0;
-  setInterval(() => {
+  function check() {
     const screen = screenOf(location.pathname);
     if (screen !== lastScreen) {
       lastScreen = screen;
@@ -199,7 +204,29 @@
     if (same && tick !== 0) return;
     lastInputs = inputs;
     publish(false);
-  }, 500);
+  }
+  setInterval(check, SAFETY_MS);
+
+  // 遷移の直後は __INITIAL_STATE__ の差し替えが少し遅れて来ることがあるので、間をおいて数回見る。
+  // コンテンツスクリプト（分離ワールド）は history の呼び出しを見られないので、遷移をここから知らせる。
+  const ROUTE_CHANNEL = 'azr:route';
+  function onNavigate() {
+    window.postMessage({ source: ROUTE_CHANNEL, path: location.pathname }, location.origin);
+    for (const ms of [0, 300, 1000, 2500]) setTimeout(check, ms);
+  }
+  for (const name of ['pushState', 'replaceState']) {
+    const native = window.history?.[name];
+    if (typeof native !== 'function') continue;
+    window.history[name] = function patchedHistory(...args) {
+      const r = native.apply(this, args);
+      try { onNavigate(); } catch { /* ページ側の動きは止めない */ }
+      return r;
+    };
+  }
+  window.addEventListener('popstate', onNavigate);
+  // 最初の __INITIAL_STATE__ は document_start より後に書かれる
+  if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', check);
+  window.addEventListener('load', check);
 
   // コンテンツスクリプト側が後から立ち上がったときのための再送要求
   window.addEventListener('message', (e) => {
