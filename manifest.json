@@ -31,7 +31,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.amazon.co.jp/*"],
-      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n-data.js", "src/lib/i18n.js", "src/lib/amazon-slot.js", "src/content/amazon-link-early.js"],
+      "js": ["src/lib/settings.js", "src/lib/health.js", "src/lib/i18n-data.js", "src/lib/i18n.js", "src/lib/amazon-match.js", "src/lib/amazon-slot.js", "src/content/amazon-link-early.js"],
       "run_at": "document_start"
     },
     {
