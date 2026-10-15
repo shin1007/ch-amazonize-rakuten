@@ -71,6 +71,7 @@
   const HOMES = {
     rakuten: {
       key: 'rakuten', name: '楽天',
+      settings: { amazon: 'amazonPrice', yahoo: 'yahooPrice' }, // 並べる店ごとの出す・出さないの設定
       pricing: () => AZR.itemPricing?.value || null,
       same: (applied) => tr('{applied}楽天と同じ価格', { applied }),
       range: (applied, lo, hi) => tr('{applied}楽天は選択によって {lo}〜{hi}', { applied, lo, hi }),
@@ -80,6 +81,7 @@
     },
     yahoo: {
       key: 'yahoo', name: 'Yahoo!ショッピング',
+      settings: { amazon: 'yahooItem', rakuten: 'yahooPageRakuten' },
       pricing: () => null,
       same: () => tr('Yahoo!ショッピングと同じ価格'),
       range: (applied, lo, hi) => tr('Yahoo!ショッピングは選択によって {lo}〜{hi}', { lo, hi }),
@@ -200,7 +202,7 @@ ${how}` },
       diff = diffLine(site, data, pick.item, sure, home);
     }
     const note = site.disclosure();
-    note.append(AZR.settingsLink()); // 注記の行の右に添える
+    note.append(AZR.settingsLink(home.settings?.[site.key])); // 注記の行の右に添える
     box.replaceChildren(
       itemRow(site, 'code', results.code, code, data),
       itemRow(site, 'title', results.title, code, data),

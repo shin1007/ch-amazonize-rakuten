@@ -89,6 +89,7 @@
         apiError: (e) => tr('楽天API エラー: {e}', { e }),
         // 楽天へのリンクは開発者のアフィリエイトID付き。その旨を小さく添える
         disclosure: () => AZR.slot.disclosure(),
+        setting: 'rakutenLink',
         checkShops: true,
         place: (wrap) => {
             const yahoo = document.getElementById('yahoo-link-btn');
@@ -104,6 +105,7 @@
         price: (p, via) => tr('Yahoo! ￥{p}{via}', { p, via }),
         apiError: (e) => tr('Yahoo!ショッピングAPI エラー: {e}', { e }),
         disclosure: () => AZR.slot.yahooDisclosure(),
+        setting: 'amazonPageYahoo',
         checkShops: false,
         place: (wrap) => {
             const rakuten = document.getElementById('rakuten-link-btn');
@@ -327,7 +329,7 @@
                 wrap.appendChild(row);
             }
             const note = site.disclosure();
-            note.append(AZR.settingsLink()); // 注記の行の右に添える
+            note.append(AZR.settingsLink(site.setting)); // 注記の行の右に添える
             wrap.appendChild(note);
 
             site.place(wrap);

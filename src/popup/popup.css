@@ -31,6 +31,9 @@ label {
 }
 label.sub { padding-left: 20px; color: #565959; }
 .switch { font-weight: 700; }
+/* 商品ページの「表示の設定」から開いたときに強調する設定 */
+label.focus { border-radius: 4px; outline: 2px solid #ff9900; animation: azr-focus 2.4s ease-out; }
+@keyframes azr-focus { 0%, 40% { background: #ffe8b3; } 100% { background: transparent; } }
 
 textarea {
   width: 100%;
