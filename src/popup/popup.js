@@ -49,6 +49,21 @@ async function init() {
       chrome.storage.sync.set({ [key]: input.checked }));
   }
 
+  /* 商品ページの「表示の設定」から開いたとき、その欄の設定を強調する ------------------
+   * service worker が session に置く。開いていた画面にも届くよう、変わったときも拾う。一度使ったら消す */
+  const focusSetting = (f) => {
+    if (!f?.key || Date.now() - f.at > 10000) return;
+    chrome.storage.session.remove('optionsFocus').catch(() => {});
+    const label = document.querySelector(`input[data-key="${CSS.escape(f.key)}"]`)?.closest('label');
+    if (!label) return;
+    label.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    label.classList.remove('focus');
+    void label.offsetWidth; // 続けて飛んできても点滅し直す
+    label.classList.add('focus');
+  };
+  chrome.storage.session.get('optionsFocus').then((r) => focusSetting(r.optionsFocus)).catch(() => {});
+  chrome.storage.session.onChanged?.addListener((c) => focusSetting(c.optionsFocus?.newValue));
+
   const urls = $('#campaignUrls');
   urls.value = (s.campaignUrls || []).join('\n');
   urls.addEventListener('change', () => {

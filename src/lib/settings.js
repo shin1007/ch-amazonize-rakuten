@@ -67,8 +67,9 @@
     } catch { /* extension context invalidated */ }
   };
 
-  // 商品ページの欄に添える、設定（ポップアップと同じ画面）をタブで開くリンク。開くのは service worker
-  AZR.settingsLink = () => {
+  // 商品ページの欄に添える、設定（ポップアップと同じ画面）をタブで開くリンク。開くのは service worker。
+  // focus は強調する設定のキー（その欄を出し分ける設定）
+  AZR.settingsLink = (focus) => {
     const a = document.createElement('a');
     a.href = '#';
     a.textContent = AZR.t?.('表示の設定') ?? '表示の設定';
@@ -76,7 +77,7 @@
     Object.assign(a.style, { marginLeft: '8px', color: '#007185' });
     a.addEventListener('click', (e) => {
       e.preventDefault();
-      chrome.runtime.sendMessage({ type: 'azr:openOptions' }).catch(() => {});
+      chrome.runtime.sendMessage({ type: 'azr:openOptions', focus }).catch(() => {});
     });
     return a;
   };

@@ -44,9 +44,14 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   } catch { /* 引き継げなくても既定（出す）で動く */ }
 });
 
-// 商品ページの欄の「表示の設定」から、設定の画面をタブで開く（content script からは開けない）
+// 商品ページの欄の「表示の設定」から、設定の画面をタブで開く（content script からは開けない）。
+// 強調する設定は session に置き、開いた（開いていた）画面が拾う
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg?.type === 'azr:openOptions') chrome.runtime.openOptionsPage().catch(() => {});
+  if (msg?.type !== 'azr:openOptions') return;
+  chrome.storage.session.set({ optionsFocus: msg.focus ? { key: msg.focus, at: Date.now() } : null })
+    .catch(() => {})
+    .then(() => chrome.runtime.openOptionsPage())
+    .catch(() => {});
 });
 
 // 店舗ごとのキー（shop:<店舗>）で持っていた閉店判定は azrShops にまとめた。古いキーを消す
