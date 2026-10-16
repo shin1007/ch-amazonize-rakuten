@@ -11,9 +11,41 @@
  *
  * play() はページ側の関数なので、コンテンツスクリプト（分離ワールド）からは差し替えられない。
  * 止めるのは item.js が再構成したときだけ（<html data-azr-no-autoplay>）。
+ *
+ * 店によっては、動画を店のサイト（www.rakuten.ne.jp/gold/…）のページごと iframe で埋め込む。
+ * その中にも入り、止めるかどうかは商品ページ（最上位）の上の印を postMessage で聞いて従う。
+ * 答えが来るまでは止めておく（読み込み時の自動再生を通さないため）。
  */
 (() => {
   const USER_GRACE_MS = 1000;
+  const ITEM_ORIGIN = 'https://item.rakuten.co.jp';
+  const MSG = 'azr:noAutoplay';
+  const inFrame = window.top !== window;
+  if (inFrame) {
+    const ancestors = location.ancestorOrigins;
+    if (!ancestors?.length || ancestors[ancestors.length - 1] !== ITEM_ORIGIN) return; // 商品ページの中だけ
+  }
+
+  let frameBlocked = true;
+  const blocked = () => (inFrame ? frameBlocked : document.documentElement.hasAttribute('data-azr-no-autoplay'));
+
+  if (inFrame) {
+    window.addEventListener('message', (e) => {
+      if (e.source !== window.top || e.origin !== ITEM_ORIGIN || e.data?.type !== MSG) return;
+      frameBlocked = Boolean(e.data.on);
+      // 印が付く前の答えで流れ始めていたら止める
+      if (frameBlocked) for (const v of document.querySelectorAll('video')) if (!v.paused) v.pause();
+    });
+    window.top.postMessage({ type: MSG, ask: true }, ITEM_ORIGIN);
+  } else {
+    // 中の iframe に聞かれたら答え、印が変わったら全部の iframe に知らせる
+    const tell = (win, origin = '*') => { try { win.postMessage({ type: MSG, on: blocked() }, origin); } catch { /* 閉じた枠 */ } };
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === MSG && e.data.ask && e.source) tell(e.source, e.origin);
+    });
+    new MutationObserver(() => { for (let i = 0; i < window.frames.length; i++) tell(window.frames[i]); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-azr-no-autoplay'] });
+  }
   let lastInput = { target: null, at: 0 };
 
   const note = (e) => {
@@ -33,7 +65,7 @@
   const nativePlay = HTMLMediaElement.prototype.play;
   HTMLMediaElement.prototype.play = function play(...args) {
     try {
-      if (document.documentElement.hasAttribute('data-azr-no-autoplay') && !pressedInside(this)) {
+      if (blocked() && !pressedInside(this)) {
         return Promise.reject(new DOMException('Amazonize Rakuten: 自動再生を止めました', 'NotAllowedError'));
       }
     } catch { /* ページ側の再生は絶対に壊さない */ }

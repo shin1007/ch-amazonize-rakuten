@@ -184,6 +184,15 @@
       "run_at": "document_start",
       "world": "MAIN",
       "all_frames": false
+    },
+    {
+      "matches": [
+        "https://www.rakuten.ne.jp/gold/*"
+      ],
+      "js": ["src/content/video-guard.js"],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
     }
   ]
 }
