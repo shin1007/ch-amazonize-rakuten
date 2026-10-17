@@ -4,11 +4,13 @@ A browser extension that rebuilds Rakuten Ichiba item pages into a clear, Amazon
 ・Rebuilds the page into 3 columns: images / details / buy box. Add to cart without scrolling through long descriptions
 ・Gathers product images buried in the description into the gallery on the left; identical images are merged into one
 ・Click an image to enlarge it; use the ←→ keys to move to the next image
-・Product videos sit in the gallery too. They never autoplay — only when you press play
+・Product videos sit in the gallery too. They never autoplay — only when you press play. Videos embedded from a shop’s own site do not autoplay either
 ・Shows item and shop review ratings under the product name
 ・Shows the Amazon price for the same item right under the Rakuten price (with the Amazon product name, rating and a link to the search results)
 ・Items matched by JAN code are marked "JAN match"; items found by name are marked "Reference"
 ・Also shows the Yahoo! Shopping price of the same item on Rakuten and Amazon item pages (can be turned off in settings)
+・When both shipping costs are known, prices are compared including shipping; otherwise it says shipping is not included
+・Open the display settings directly from the price section
 
 ■ Rakuten price and link on Amazon item pages
 ・Shows a link and price for the same item on Rakuten Ichiba on Amazon.co.jp item pages
@@ -20,7 +22,7 @@ A browser extension that rebuilds Rakuten Ichiba item pages into a clear, Amazon
 ■ On Yahoo! Shopping too
 ・Use ←→ to flip through item images (also in the enlarged view; Esc closes it)
 ・Shows what the same item costs on Amazon and Rakuten, right below the price (can be turned off in settings)
-・Fades sponsored (PR) items in search results
+・Fades sponsored (PR) items in search results and category lists
 
 ■ Cart total
 ・Combines item totals, shipping and points to earn across multiple shops into a single panel
@@ -31,6 +33,7 @@ A browser extension that rebuilds Rakuten Ichiba item pages into a clear, Amazon
 ・Get the coupons shown on an item page right there, without going to the coupon page
 ・The coupons you got can be listed from the toolbar button
 ・On the order confirmation page, automatically switches to the coupon that takes off the most for this order (compared by discount amount, not percentage)
+・If the discount turns out smaller after an automatic switch, it switches back to the previous coupon
 ・You can also choose to be asked before applying
 ・It never presses the order confirmation button. You always place the order yourself
 
@@ -43,10 +46,13 @@ A browser extension that rebuilds Rakuten Ichiba item pages into a clear, Amazon
 ・Lets you review a list of entered campaigns afterwards — something Rakuten does not provide
 
 ■ Settings
-Each feature can be turned on or off from the toolbar icon.
+Each feature can be turned on or off from the toolbar icon (or the extension’s options page).
+・Actions performed automatically with your Rakuten account (automatic coupon claiming, automatic switching at checkout, automatic campaign entry) do not run until you agree on the confirmation page that opens right after installation
+・Whether to show prices from other sites can be chosen separately for each site you are viewing (Rakuten, Amazon, Yahoo! Shopping)
 
 ■ Privacy
-・It changes the display only on Rakuten Ichiba (rakuten.co.jp) pages and Amazon.co.jp item and wish list pages, and Yahoo! Shopping item and search pages
+・It changes the display only on Rakuten Ichiba (rakuten.co.jp) pages and Amazon.co.jp item and wish list pages, and Yahoo! Shopping item, search and category pages
+・On Rakuten shops’ own sites (www.rakuten.ne.jp/gold), it only stops embedded item videos from autoplaying and does not change the display
 ・The Amazon price is shown by reading Amazon's search results for the item's name or JAN code. No login information (cookies) is sent to Amazon
 ・Only when showing the Rakuten price on an Amazon item page, the search terms for that item (JAN code, ISBN, model number, product name) are sent to a relay server for the Rakuten Ichiba Item Search API, operated by the developer. The relay passes them to the Rakuten API and returns the result; it does not receive login information, browsing history, purchases or personal information, and stores nothing except a cache of the result for up to 1 hour
 ・Apart from those search terms, no browsing history, purchases or personal information is sent to the developer or any third party

@@ -183,9 +183,9 @@ async function shoot(lang) {
     console.log(`raw/${lang}/amazon.png`);
     await amazon.close();
 
-    // ポップアップ（エントリー済み一覧を開いた状態）
+    // ポップアップ（キャンペーンの欄）
     const popup = await ctx.newPage();
-    await popup.setViewportSize({ width: 400, height: 900 });
+    await popup.setViewportSize({ width: 400, height: 1600 }); // キャンペーンの欄は下の方にあるので、切り出す範囲が画面に収まる高さにする
     await popup.goto(`chrome-extension://${extId}/src/popup/popup.html`);
     await popup.waitForSelector('#campaignList li', { state: 'attached' }); // 閉じた details の中なので見えてはいない
     // ベトナム語などはOSの既定フォントだと結合文字がずれるので、見出しと同じフォントで撮る
@@ -196,14 +196,11 @@ async function shoot(lang) {
       await popup.waitForTimeout(500);
     }
     await popup.evaluate((text) => {
-      document.querySelector('.campaigns').open = true;
       document.getElementById('scanStatus').textContent = text;
     }, TEXT[lang].scanStatus);
-    // 全部だとスライドに収まらないので、キャンペーンの欄だけ切り出す
-    // body は幅300pxに左右の余白が付く（content-box）ので、幅は body から取る
-    const body = await popup.locator('body').boundingBox();
-    const box = await popup.locator('section:nth-of-type(3)').boundingBox();
-    await popup.screenshot({ path: join(rawDir, 'popup.png'), clip: { x: 0, y: box.y - 4, width: body.width, height: box.height + 14 } });
+    // 全部だとスライドに収まらないので、キャンペーンの欄だけ切り出す（欄の並びが変わってもずれないよう、一覧を持つ欄で探す）
+    const box = await popup.locator('section:has(#campaignList)').boundingBox();
+    await popup.screenshot({ path: join(rawDir, 'popup.png'), clip: { x: box.x - 16, y: box.y - 4, width: box.width + 32, height: box.height + 14 } });
     console.log(`raw/${lang}/popup.png`);
   } finally {
     await ctx.close();
