@@ -4,6 +4,7 @@
  *
  * 出力は tools/out/amazonize-rakuten-<version>.zip（manifest の version から）。
  * 入れるのは manifest.json / src / icons / _locales / LICENSE だけ（tests・tools・store・fixtures は入れない）。
+ * manifest からは開発版でしか使わない notifications の権限を外す。
  * Windows の Compress-Archive は区切りに \ を使ったzipを作るので、ここで自前で書いている。
  */
 import { deflateRawSync } from 'node:zlib';
@@ -37,8 +38,17 @@ const local = [];
 const central = [];
 let offset = 0;
 
+/* notifications は開発版のサイト変化チェックの通知にしか使わない（health.dev のときだけ許可を求める）。
+ * ストア版では使わない権限なので、ストアに上げる manifest からは外す（入れておくと理由の入力を求められる）。 */
+function storeManifest(raw) {
+  const m = JSON.parse(raw.toString('utf8'));
+  m.optional_permissions = (m.optional_permissions || []).filter((p) => p !== 'notifications');
+  if (!m.optional_permissions.length) delete m.optional_permissions;
+  return Buffer.from(JSON.stringify(m, null, 2) + '\n', 'utf8');
+}
+
 for (const name of files) {
-  const raw = readFileSync(join(ROOT, name));
+  const raw = name === 'manifest.json' ? storeManifest(readFileSync(join(ROOT, name))) : readFileSync(join(ROOT, name));
   const body = deflateRawSync(raw, { level: 9 });
   const nameBuf = Buffer.from(name, 'utf8');
   const head = Buffer.alloc(30);

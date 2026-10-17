@@ -171,59 +171,59 @@
     "bpmjnoalibphoeeklhjfppdlinjehneo": {
       "screenshots": {
         "ja": [
-          "1cb50f2da4239c9c67b377f8c421d0f84908220f6f8cbbb73dd9f86a0eb1a37b",
-          "340e3f3b46070543a2821b1d16a78e35c9ef4baeb2570e9cf2b56d89f3899cfd",
-          "4e609027a02ca8338b05827b98fde4a62134130cabb32001bdf44a910a7c2381",
-          "5bbc2354879f2ee350aedfd4312bc00e9c96e0bbccd6f17c07d390a5db1920f9",
-          "6a4e63396bc9b358afa174f241d27bdec417f31a29f393b3388ff61c03fa4c55"
+          "0be0443068da3bc8d55ae20c8d3be5ca72e7123a4e9291a6ecca6e760bfb55a5",
+          "3d4b38cc6da75296d7ff6de38ce1dba9b053b1c9ba727af58c251d2f12a1d54c",
+          "57f4c2b80930620ad5238e9d7e26e0512f1a866159a1e3e986e338ef956749e1",
+          "3c880b78ded0809cf61505addf738926c58e63e907cc7d4784fb0c2bda289030",
+          "91b7fe8814ac84b6dbd2df59b03b8f86ecf7c2465b7f246d7c85ea4f798baf98"
         ],
         "en": [
-          "37e1e0db48f3c6e89d7dd91b14ac151b85ae401b63e77e96e1f9486056119022",
-          "b0cf281662b610dd2ff0696c14a7f688e3e27fdac80de4646a808eff1f36394e",
-          "47f58c6fa03d8392aa433777b57018815a4894d3d2c70174b3c0058a07878ea8",
-          "5af8d9bfc1e9e723774620a3748804f04bee9e8954242f991564fd19ebfd57cf",
-          "f85deb154e6256830b17c81ccd06f0aa2ef080f25e2930819680c46f5facc59d"
+          "c9be2e0b48d39d2bd26126e7a4186cdb69c7576dedf1b4a125bc5f30fe5bc8c4",
+          "17655b43345247ea26ba4a5c5daee3423a4e75b9c534854472328e6a7e90ed2f",
+          "6f3337bc2d3b35b8b7c49637d50ca3941f256dbed4c39d6c4e1e854fee9a63ba",
+          "74fdf7fb36d278ab58abf77ae67fb739552bb365e57d9847b5d1817d470248d0",
+          "fa8a772e4a1098e7649d3f937767e6b30bea931884b44599205328e10afe94bf"
         ],
         "zh_CN": [
-          "a6b5dbcad996f7d4ddbd9fc27dddd8b1b415970d58d3b34d76e6b1d07d04cb0c",
-          "17ffef817091ed34f56e2acdc9c0d8083c19def7f196fd69b7a12630a3ea0aa4",
-          "5edddb252049672c99b7ea66bc7c898b8418eb1898f0dd69175fec23822b8c67",
-          "eab4ea58d997bf70cada4f6a62fc41e46ee3c51108cbd49693c4970f9c3d57d9",
-          "7ee0749d003492af4436a303e09cfea8afa8fdaadb20c53046e2e24e2dfa54d0"
+          "a1abe6d443c44f4cab20ce320ba6d141678be750353c74735face9e4de575e5e",
+          "de141fc37ef659f95a9a8d673cb904d1cf2ba4764098b26b4f328f9302fba231",
+          "82d8638a0b77aa9c0c726bacb3bab3b8c8f4bf5fd78441d6512ef2d0944dff2d",
+          "d7f5fd2b16e39fb1559588339927a83b1c8dbe2d4e7abb52a9e2e595c80ae040",
+          "65218b1fec3655abc36327da65323945c5194dffc01cffe9bcf649b0aeab0ca8"
         ],
         "zh_TW": [
-          "bb68391fc1f3064e793ebee538c044c2ae0b6ee2adb948fef781fe808fe1e74a",
-          "9cbbbb49e0e33750e0d0714e4300307c79e2123bf70cc008fe9e63fe60f32580",
-          "caad37568ef28d6143545ae66638828406b817ea6b3dfc94773bfdcba7a675de",
-          "d2cbe12786990a406128bd1306a031b9671eb1cefc1c5f3c0e88b72769175b0e",
-          "2d76865eb71feae6768df640319734926ee3f47e1d9b1f8f3dcc211730f9da17"
+          "fe37aa4bdbd3699317e6d308e67c806b526847f4b1b430de7d39c477371503dc",
+          "1e89f68ab2f1dd6f48ae360f67aadfbcabd2ab0de5fbd28dfb1ff7c4c0e1de26",
+          "e31654a43d26299f6b4b9f6c5165295bfef2655e517d8570ebe98b942499883f",
+          "e8e0aefed80cf4270c3ab493c51235e6b588b6218ebde76f2c02b4a7afd3c11e",
+          "9c069df7ad6e313dec1074819ce08322ae9c4b3b564b49bcb181713b6021acf7"
         ],
         "ko": [
-          "9b1ce016f162446828d404172c70642b750b9e505c2701f50be9749a828d80b5",
-          "bcb225cbeaff26f9a8aede7b17eea3676303450ed3f104c82dbe199287fbd9fe",
-          "7db9592ae7baa3d07f3f50312c0abb8195d29e1f6258306c678f38b487e80f48",
-          "86cc6289fe74e060260ca095dcd2bfbff1d85dd16c79dce113aa92213a6df891",
-          "e456f0f488b2d401f00e2b4b60404086fdf47fa697dc39ae1f2b17c02964f683"
+          "be374b226cc85e93e2728a821f3472efdbc1c0806491547d7347460ed5ccbcbf",
+          "a9f81a0ee7602c7dbb30cc146c28da3bfb01d5ffcdfc3731995a53f0c4937870",
+          "83124750ea96ce25a5fcdcde3b54820f1a838a292e91629a0985181a0cf82e0d",
+          "bdd5e6c13ddd0a373a96b0411d601dffc8cc015f7d90121d2e5fb4efdcb550ce",
+          "12707f6704e0ed63e934c935104add94378104f4ed1bcc9bbd7ea385371e6915"
         ],
         "vi": [
-          "12c6e4d5e9ba7b35fa43b1d1cf414d8368d33d3313ca07b538caf3bb2b5c2c6c",
-          "4babc9596d200e7fe5e566acc0b63d73c938e4279ef035322454aa5d668b9fcf",
-          "dd3c7aff7c1649dd1e751a344e7c4fb12dea4b869a4d0239483232e2b6307b6b",
-          "692642fb8e62958b53a712064a91634085d76168b464a8cf9e6e32a6a22ba018",
-          "15524d627e9d47f8c20540bb06f1b9a34ada9963ebecb018f63417fff127eb45"
+          "e6ad1d0d36c28961608421467d7d611abf469cf10f8cfa7a3c43f13cb4429c48",
+          "3349baac16e78155aa7f3b4574e46c7c3e214c5f99f01d06186b1a1de3323e16",
+          "4186229630e5086519cb33d164a06130ef022e9ce7826751fc1aea992f16a67c",
+          "6e462e2964c0121f3978efbcd217e2ee01b627782fe946304bcc0970c1bf7557",
+          "bcb02a64a640d8952927fd71c92e3439561791b4a2f9145a0944ec9236a49db2"
         ],
         "id": [
-          "8a2ba09dfe9135ccb1f6c19a78a2b7f0ba409b57c02d20b38f7056f92b8650c2",
-          "a3b0c6b3868da1fc3291d1e72980fe67d1e23df53e1954566f06ff6fb2c89e71",
-          "670b56b15f002df14487719a1d3089c02d896277c056dab1187dde507f580df5",
-          "6f2e31c10254782459321a0cfb26f8abebf54393122a7cd11cf8986799e6aee0",
-          "f07db99315f0efdb1944374b6885881d6be02c60694a2ae6ddc8055711ffd022"
+          "542abeae0178e15d9e7f3a6f5d499993325d0f2837d415f28bc4e2842b6c792f",
+          "35a54eb825ebe24bae418dbae8f2debf2863b6ce77b71bb5f50f429f1a940436",
+          "0baafcd596e0ef0cd64c7c26e4f729f954a35e047dd84450c4ad41ea05ed7ba4",
+          "2ba23bb3ace0e1f849a49c06cec9867b37f328683f969a46f7679844f7d5502f",
+          "d9d10236d4b6bc4408913aebd9755dd0eb9f0d1e686c8ab62c74b89154679d97"
         ]
       },
       "fields": {
         "package.zip": {
-          "hash": "aafd972e0a4358c78bb10ef3e477f1ccdc1d2e889f97a99b827ed9f7ee255563",
-          "appliedAt": "2026-10-01T00:30:54.562Z"
+          "hash": "a96102cc3cb3ef1f6f60f25875606b07bc62e5ce99b448438c7ac4af511c95a8",
+          "appliedAt": "2026-10-17T10:50:21.827Z"
         },
         "privacy.singlePurpose": {
           "hash": "5864a11e442e2be0bbd1b35318a036e90a490f84c173e7164231f89147c24a81",
@@ -250,8 +250,8 @@
           "appliedAt": "2026-09-30T08:34:12.587Z"
         },
         "privacy.permission.host permission": {
-          "hash": "104657cf2656b056b7b6c8f5b7e754422f051a2ef2f4aa2421d5a8215cc858d5",
-          "appliedAt": "2026-10-01T00:31:03.424Z"
+          "hash": "805bb804ccb88211d6727275b1eb3e3ac009848b3d6edd47bc7a1aa8c62e1751",
+          "appliedAt": "2026-10-17T10:50:28.166Z"
         },
         "storeListing.category": {
           "hash": "156877b5b3ddee5bc23709d7e50ca9a29e8874d3d507255e455e92adf9b31358",
@@ -270,68 +270,68 @@
           "appliedAt": "2026-09-30T08:36:43.753Z"
         },
         "storeListing.marqueeTile": {
-          "hash": "0934f1765321c3eb837917d258a83350bea19cb04a3569f9faa93bc384197704",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "db9daf065c0eb319413ab63cf8c0c5cc3ebf5a4a0eb38a45dc7fd360c18b8980",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.homepageUrl": {
           "hash": "ae2dbf39ea6ddf426b03ec3999bfe6da890ed4056b0f7a5d918307250f342475",
           "appliedAt": "2026-09-30T08:36:43.753Z"
         },
         "storeListing.locale.ja.description": {
-          "hash": "b760c56d5b7e325e105c8126042fe7206da25cafb560c1e25e8eb282ab5c0382",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "08216ce494089fa8827920c3e695d54b21cd6db5af775fac63375c787fcc71af",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.ja.screenshots": {
-          "hash": "86db3481512366dd20aacff86457d9085eba13f6dbb364eb16d0d48031d50151",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "7a90cecee54f5748fb7801a27a8ab662f8850520a29a44ddba5eb5562abbea48",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.en.description": {
-          "hash": "ba62941a51a630e6a351797e4226ae00508e879d6cab31a3e82a45c32e29b662",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "226b9ff42eff420f40ea6dc4711fde6d0ac2084ee17ca875fec708e389dd3de5",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.en.screenshots": {
-          "hash": "bfffbee61cbcec0ae1b5b4c83d2fe08fa2f1ba8dde46cabdbbbc3fe90eccf755",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "a94c4c46edb38082fc62c60fe3697740fc7c759d8432a6265dd41d33702e1d3a",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.zh_CN.description": {
-          "hash": "dcb414f4d4754274a0121ee3769a9c85fceef0299c374f9f09fcd0f261226735",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "8f3fc9d498768ed7ec97318d51a99dedd2e7fa6f6942660a91c5b9f1d87811c2",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.zh_CN.screenshots": {
-          "hash": "2bc8a1aa4abf1ea72e196284473d62ae2edd5f83bc39772bb5e963b06929439c",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "130cff5d21f5f5e62cf91563920d4b851027d8b525afd4e7c7de6adfcd230d1c",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.zh_TW.description": {
-          "hash": "919781c44adf16839952c197fe594e6c09b9953671b941e74ecd5d8189f2b410",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "62fdc51fd1ed1f289d8f7ab235bf4aedc214f4e1972d5d23c281c0446842b461",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.zh_TW.screenshots": {
-          "hash": "f89928e8b4f616f348d9b9332f346428c64332c6f23657cc69922d079f3b1526",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "0538e48e6178a53dd78bc2ccd237252a13ff7a7e00d1f33b385c6fea84cec78d",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.ko.description": {
-          "hash": "4815af781e64784b8be4bd977c972894fc8853701c0fa7ea673d795f2cc114d5",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "d71310067c5ec5351d35a7dec73de5d5fb4abdba5da035745176d3a95a44c387",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.ko.screenshots": {
-          "hash": "962c27c5c9d03d32cc990d55ebf89f90cc4a0966715e66488b392b34fd2a8fb8",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "fb4d8fd79b8e394e3bdab4d029d99cc2e3030eeb44352320def6145c1a03089d",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.vi.description": {
-          "hash": "965e28cc0c31587fb58e847723293c8846d2f58aba14bc09d934f3781781aba8",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "0ce44d8a34fc7008218facf31ef72ed6ceebf9c265b4b382addf5882fd798207",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.vi.screenshots": {
-          "hash": "e618ae5d9b0566ea352c320cf77e83bf4b21d39005c673daf965460ee2926a58",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "05baaa9dbac449e249f0fbb13cd153c6af0eb21eac0cf5d04ed6f23ac446580a",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.id.description": {
-          "hash": "5737079c01222682765d81f02d935db16f49067c2d30b9cb2f7f0d0aefbe8730",
-          "appliedAt": "2026-10-01T00:34:46.439Z"
+          "hash": "925b82daab46170c2e704533cc2c7b8df29d2d4bbf791b60fdfe852ee20c1352",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         },
         "storeListing.locale.id.screenshots": {
-          "hash": "2e78bd6288412b3de3c9ce3f2094a0654a32cd3f7c565c50df21c344b1b86de5",
-          "appliedAt": "2026-10-01T13:30:11.658Z"
+          "hash": "4fcff75aec1663934b08fadb32ab7e42060b93e1d7500c590c9e0a5edba52aa8",
+          "appliedAt": "2026-10-17T10:56:05.599Z"
         }
       }
     }
