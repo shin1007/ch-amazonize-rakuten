@@ -4,11 +4,13 @@ Tiện ích mở rộng này sắp xếp lại trang sản phẩm của Rakuten 
 ・Sắp xếp lại thành 3 cột: hình ảnh / thông tin sản phẩm / khu vực mua hàng. Thêm vào giỏ ngay mà không cần cuộn qua phần mô tả dài
 ・Gom các hình ảnh sản phẩm nằm lẫn trong phần mô tả vào thư viện bên trái; những hình giống nhau được gộp thành một
 ・Nhấp vào hình để phóng to, dùng phím ←→ để chuyển sang hình tiếp theo
-・Video sản phẩm cũng nằm trong thư viện. Không tự phát, chỉ phát khi bạn bấm nút phát
+・Video sản phẩm cũng nằm trong thư viện. Không tự phát, chỉ phát khi bạn bấm nút phát. Video nhúng từ trang web riêng của cửa hàng cũng không tự phát
 ・Hiển thị đánh giá của sản phẩm và cửa hàng ngay dưới tên sản phẩm
 ・Hiển thị giá của cùng sản phẩm trên Amazon ngay dưới giá Rakuten (kèm tên sản phẩm, điểm đánh giá trên Amazon và liên kết đến kết quả tìm kiếm)
 ・Sản phẩm khớp theo mã JAN được ghi "Khớp mã JAN", sản phẩm tìm theo tên được ghi "Tham khảo"
 ・Hiển thị thêm giá Yahoo! Shopping của cùng sản phẩm trên trang sản phẩm Rakuten và Amazon (có thể tắt trong cài đặt)
+・Khi biết phí vận chuyển của cả hai bên, giá được so sánh đã gồm phí vận chuyển; nếu không biết, tiện ích ghi rõ là chưa gồm phí vận chuyển
+・Có thể mở ngay cài đặt hiển thị từ phần giá
 
 ■ Giá và liên kết Rakuten trên trang sản phẩm Amazon
 ・Hiển thị liên kết và giá của cùng sản phẩm trên Rakuten Ichiba ngay trên trang sản phẩm của Amazon.co.jp
@@ -20,7 +22,7 @@ Tiện ích mở rộng này sắp xếp lại trang sản phẩm của Rakuten 
 ■ Cả trên Yahoo! Shopping
 ・Dùng phím ←→ để chuyển ảnh sản phẩm (cả trong chế độ phóng to, Esc để đóng)
 ・Hiển thị giá của cùng sản phẩm trên Amazon và Rakuten ngay dưới giá (có thể tắt trong cài đặt)
-・Làm mờ sản phẩm quảng cáo (PR) trong kết quả tìm kiếm
+・Làm mờ sản phẩm quảng cáo (PR) trong kết quả tìm kiếm và danh sách danh mục
 
 ■ Tổng giỏ hàng
 ・Gom tổng tiền sản phẩm, phí vận chuyển và điểm dự kiến nhận từ nhiều cửa hàng vào một bảng duy nhất
@@ -31,6 +33,7 @@ Tiện ích mở rộng này sắp xếp lại trang sản phẩm của Rakuten 
 ・Nhận phiếu giảm giá hiển thị trên trang sản phẩm ngay tại chỗ, không cần chuyển sang trang phiếu giảm giá
 ・Có thể xem danh sách phiếu đã nhận từ nút trên thanh công cụ
 ・Ở màn hình xác nhận đơn hàng, tự động chuyển sang phiếu "giảm được nhiều nhất cho đơn này" trong số các phiếu dùng được (so sánh theo số tiền giảm, không theo phần trăm)
+・Nếu sau khi tự động chuyển mà số tiền giảm lại ít hơn, tiện ích sẽ chuyển lại phiếu giảm giá trước đó
 ・Cũng có thể đặt để xác nhận trước khi áp dụng
 ・Tuyệt đối không bấm nút xác nhận đặt hàng. Bạn luôn tự mình đặt hàng
 
@@ -43,10 +46,13 @@ Tiện ích mở rộng này sắp xếp lại trang sản phẩm của Rakuten 
 ・Có thể xem lại "danh sách đã đăng ký" — thứ mà Rakuten không cung cấp
 
 ■ Cài đặt
-Bật hoặc tắt từng tính năng từ biểu tượng trên thanh công cụ.
+Bật hoặc tắt từng tính năng từ biểu tượng trên thanh công cụ (hoặc trang tùy chọn của tiện ích).
+・Các thao tác tự động bằng tài khoản Rakuten của bạn (tự động nhận phiếu giảm giá, tự động chuyển phiếu khi xác nhận đơn hàng, tự động đăng ký chiến dịch) sẽ không chạy cho đến khi bạn đồng ý trên trang xác nhận mở ra ngay sau khi cài đặt
+・Có thể chọn riêng cho từng trang đang xem (Rakuten, Amazon, Yahoo! Shopping) có hiển thị giá của các trang khác hay không
 
 ■ Quyền riêng tư
-・Chỉ thay đổi hiển thị của các trang Rakuten Ichiba (rakuten.co.jp) và trang sản phẩm, trang danh sách mong muốn của Amazon.co.jp, cùng trang sản phẩm và kết quả tìm kiếm của Yahoo! Shopping
+・Chỉ thay đổi hiển thị của các trang Rakuten Ichiba (rakuten.co.jp) và trang sản phẩm, trang danh sách mong muốn của Amazon.co.jp, cùng trang sản phẩm, kết quả tìm kiếm và danh sách danh mục của Yahoo! Shopping
+・Trên trang web riêng của các cửa hàng Rakuten Ichiba (www.rakuten.ne.jp/gold), tiện ích chỉ ngăn video sản phẩm được nhúng tự phát và không thay đổi hiển thị
 ・Giá Amazon được hiển thị bằng cách đọc kết quả tìm kiếm của Amazon theo tên sản phẩm hoặc mã JAN. Không gửi thông tin đăng nhập (cookie) đến Amazon
 ・Chỉ khi hiển thị giá Rakuten trên trang sản phẩm Amazon, từ khóa tìm kiếm của sản phẩm đó (mã JAN, ISBN, mã model, tên sản phẩm) mới được gửi đến máy chủ trung chuyển cho API tìm kiếm sản phẩm Rakuten Ichiba do nhà phát triển vận hành. Máy chủ chỉ chuyển từ khóa đến API Rakuten và trả kết quả về; máy chủ không nhận thông tin đăng nhập, lịch sử duyệt web, nội dung mua hàng hay thông tin cá nhân, và không lưu gì ngoài bộ nhớ đệm kết quả (tối đa 1 giờ)
 ・Ngoài các từ khóa tìm kiếm trên, không có lịch sử duyệt web, nội dung mua hàng hay thông tin cá nhân nào được gửi đến nhà phát triển hoặc bên thứ ba

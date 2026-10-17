@@ -4,11 +4,13 @@ Ekstensi peramban yang menyusun ulang halaman produk Rakuten Ichiba menjadi tata
 ・Disusun ulang menjadi 3 kolom: gambar / info produk / area pembelian. Masukkan ke keranjang tanpa menggulir deskripsi yang panjang
 ・Mengumpulkan gambar produk yang terselip di deskripsi ke galeri di kiri; gambar yang sama digabung menjadi satu
 ・Klik gambar untuk memperbesar, gunakan tombol ←→ untuk ke gambar berikutnya
-・Video produk juga ditaruh di galeri. Tidak diputar otomatis — hanya saat Anda menekan tombol putar
+・Video produk juga ditaruh di galeri. Tidak diputar otomatis — hanya saat Anda menekan tombol putar. Video yang disematkan dari situs milik toko juga tidak diputar otomatis
 ・Menampilkan penilaian produk dan toko di bawah nama produk
 ・Menampilkan harga produk yang sama di Amazon tepat di bawah harga Rakuten (lengkap dengan nama produk, penilaian di Amazon, dan tautan ke hasil pencarian)
 ・Produk yang cocok berdasarkan kode JAN diberi label "Kode JAN cocok", produk yang dicari lewat nama diberi label "Referensi"
 ・Juga menampilkan harga Yahoo! Shopping untuk produk yang sama di halaman produk Rakuten dan Amazon (dapat dimatikan di pengaturan)
+・Jika ongkos kirim kedua pihak diketahui, harga dibandingkan termasuk ongkos kirim; jika tidak, ditulis bahwa ongkos kirim tidak termasuk
+・Pengaturan tampilan bisa langsung dibuka dari bagian harga
 
 ■ Harga dan tautan Rakuten di halaman produk Amazon
 ・Menampilkan tautan dan harga produk yang sama di Rakuten Ichiba pada halaman produk Amazon.co.jp
@@ -20,7 +22,7 @@ Ekstensi peramban yang menyusun ulang halaman produk Rakuten Ichiba menjadi tata
 ■ Juga di Yahoo! Shopping
 ・Gunakan ←→ untuk berpindah gambar produk (juga di tampilan besar; Esc untuk menutup)
 ・Menampilkan harga produk yang sama di Amazon dan Rakuten tepat di bawah harga (dapat dimatikan di pengaturan)
-・Memudarkan produk iklan (PR) di hasil pencarian
+・Memudarkan produk iklan (PR) di hasil pencarian dan daftar kategori
 
 ■ Total keranjang
 ・Menggabungkan total barang, ongkos kirim, dan poin yang akan didapat dari beberapa toko dalam satu panel
@@ -31,6 +33,7 @@ Ekstensi peramban yang menyusun ulang halaman produk Rakuten Ichiba menjadi tata
 ・Ambil kupon yang tampil di halaman produk langsung di tempat, tanpa pindah ke halaman kupon
 ・Kupon yang sudah didapat dapat dilihat dalam daftar lewat tombol di bilah alat
 ・Di halaman konfirmasi pesanan, otomatis beralih ke kupon yang "memberi potongan terbesar untuk pesanan ini" di antara kupon yang bisa dipakai (dibandingkan berdasarkan jumlah potongan, bukan persentase)
+・Jika setelah diganti otomatis potongannya malah berkurang, kupon dikembalikan ke kupon sebelumnya
 ・Bisa juga diatur agar meminta konfirmasi sebelum diterapkan
 ・Tidak pernah menekan tombol konfirmasi pesanan. Anda selalu memesan sendiri
 
@@ -43,10 +46,13 @@ Ekstensi peramban yang menyusun ulang halaman produk Rakuten Ichiba menjadi tata
 ・Anda bisa melihat "daftar yang sudah diikuti" belakangan — sesuatu yang tidak disediakan Rakuten
 
 ■ Pengaturan
-Setiap fitur dapat diaktifkan atau dimatikan dari ikon di bilah alat.
+Setiap fitur dapat diaktifkan atau dimatikan dari ikon di bilah alat (atau halaman opsi ekstensi).
+・Tindakan yang dilakukan otomatis dengan akun Rakuten Anda (klaim kupon otomatis, penggantian kupon otomatis saat konfirmasi pesanan, ikut kampanye otomatis) tidak berjalan sampai Anda menyetujuinya di halaman konfirmasi yang terbuka tepat setelah pemasangan
+・Tampil tidaknya harga dari situs lain dapat dipilih terpisah untuk setiap situs yang sedang dilihat (Rakuten, Amazon, Yahoo! Shopping)
 
 ■ Privasi
-・Yang diubah tampilannya hanya halaman Rakuten Ichiba (rakuten.co.jp) serta halaman produk dan daftar keinginan Amazon.co.jp, serta halaman produk dan pencarian Yahoo! Shopping
+・Yang diubah tampilannya hanya halaman Rakuten Ichiba (rakuten.co.jp) serta halaman produk dan daftar keinginan Amazon.co.jp, serta halaman produk, pencarian, dan daftar kategori Yahoo! Shopping
+・Di situs milik toko Rakuten Ichiba (www.rakuten.ne.jp/gold), ekstensi hanya menghentikan pemutaran otomatis video produk yang disematkan dan tidak mengubah tampilan
 ・Harga Amazon ditampilkan dengan membaca hasil pencarian Amazon berdasarkan nama produk atau kode JAN. Informasi login (cookie) tidak dikirim ke Amazon
 ・Hanya saat menampilkan harga Rakuten di halaman produk Amazon, kata kunci pencarian produk itu (kode JAN, ISBN, nomor model, nama produk) dikirim ke server perantara untuk API pencarian produk Rakuten Ichiba yang dioperasikan oleh pengembang. Server perantara hanya meneruskannya ke API Rakuten dan mengembalikan hasilnya; server tidak menerima informasi login, riwayat penelusuran, isi pembelian, maupun data pribadi, dan tidak menyimpan apa pun selain cache hasil (maksimal 1 jam)
 ・Selain kata kunci pencarian tersebut, tidak ada riwayat penelusuran, isi pembelian, atau data pribadi yang dikirim ke pengembang maupun pihak ketiga
