@@ -855,6 +855,8 @@ function normalizeCampaignUrl(raw) {
     return normalizeCampaignUrl(inner);
   }
   if (url.hostname !== CAMPAIGN_HOST) return null;
+  // マイページ（ふるさと納税など）はキャンペーンではなく、fetchするとログイン画面へ飛ばされてCORSエラーになる
+  if (/\/mypage(\/|$)/.test(url.pathname)) return null;
   // l-id / scid などは同じページの計測違いでしかない
   return `${url.origin}${url.pathname}`;
 }
